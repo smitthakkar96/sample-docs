@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js lt-ie10 lt-ie9 lt-ie8 lt-ie7" lang="en-us"> <![endif]-->
+<!--[if IE 7]> <html class="no-js lt-ie10 lt-ie9 lt-ie8" lang="en-us"> <![endif]-->
+<!--[if IE 8]> <html class="no-js lt-ie10 lt-ie9" lang="en-us"> <![endif]-->
+<!--[if IE 9]> <html class="no-js lt-ie10 lt-ie9" lang="en-us"> <![endif]-->
+<!--[if lt IE 10]> <html class="no-js lt-ie10" lang="en-us"> <![endif]-->
+<!--[if !IE]> > <![endif]-->
+<html class='no-js' lang='en'>
+<!-- <![endif] -->
+<head>
+<title>Atomic Registry Latest | Architecture | Additional Concepts | Authentication</title>
+<meta charset='utf-8'>
+<meta content='' name='description'>
+<meta content='Project Atomic. Sponsored by Red Hat, Inc.' name='author'>
+<meta content='initial-scale=1.0,user-scalable=no,maximum-scale=1,width=device-width' name='viewport'>
+
+<link href='http://www.projectatomic.io/images/favicon.ico' rel='shortcut icon'>
+<link href='http://www.projectatomic.io/images/apple-touch-icon-precomposed.png' rel='apple-touch-icon-precomposed'>
+<link href='http://www.projectatomic.io/images/apple-touch-icon-57x57-precomposed.png' rel='apple-touch-icon-precomposed' sizes='57x57'>
+<link href='http://www.projectatomic.io/images/apple-touch-icon-72x72-precomposed.png' rel='apple-touch-icon-precomposed' sizes='72x72'>
+<link href='http://www.projectatomic.io/images/apple-touch-icon-114x114-precomposed.png' rel='apple-touch-icon-precomposed' sizes='114x114'>
+<link href='http://www.projectatomic.io/blog/feed.xml' rel='alternate' title='Project Atomic' type='application/atom+xml'>
+<link href="http://www.projectatomic.io/stylesheets/application.css" rel="stylesheet" type="text/css" />
+<link href="http://www.projectatomic.io/stylesheets/print.css" rel="stylesheet" type="text/css" media="print" />
+</head>
+<body class=' docs docs_introduction docs_introduction_index source-md'>
+<section class='container' id='page-wrap'>
+  <div class='row'>
+  <div class='col-md-3 col-lg-2' id='sidebar'>
+    <div id='nav-primary'>
+      <nav class='navbar navbar-default' role='navigation'>
+        <div class='navbar-header'>
+          <button class='navbar-toggle' data-target='.navbar-ex1-collapse' data-toggle='collapse'>
+            <span class='sr-only'>
+              Toggle navigation
+            </span>
+            <span class='icon-bar'></span>
+            <span class='icon-bar'></span>
+            <span class='icon-bar'></span>
+          </button>
+          <a class='navbar-brand' href='http://www.projectatomic.io/'>
+            Project Atomic
+          </a>
+        </div>
+        <div class='collapse navbar-collapse navbar-ex1-collapse'>
+          <ul class='nav navbar-nav'>
+            <li><a class="get-started" href="http://www.projectatomic.io/download">Get Started</a></li>
+            <li><a class="documentation" href="http://www.projectatomic.io/docs">Documentation</a></li>
+            <li><a class="developer-community" href="http://www.projectatomic.io/community">Developer Community</a></li>
+            <li><a class="on-github" href="https://github.com/projectatomic/">On GitHub</a></li>
+            <li><a class="ask" href="http://ask.projectatomic.io/">Ask</a></li>
+            <li><a class="blog" href="http://www.projectatomic.io/blog">Blog</a></li>
+            <li><a class="twitter" href="http://www.twitter.com/projectatomic">Twitter</a></li>
+            <li><a class="facebook" href="https://www.facebook.com/projectatomic">Facebook</a></li>
+            <li><a class="google" href="https://plus.google.com/108727025270662383247/posts">Google+</a></li>
+            <li><a class="rss" href="http://www.projectatomic.io/blog/feed.xml">RSS</a></li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+  </div>
+
+<section class='col-lg-10 col-md-9 container-fluid' id='content'>
+<!--[if lt IE 7]>
+<p class="chromeframe">You are using an outdated browser.
+<a href="http://browsehappy.com/">Upgrade your browser today</a> or
+<a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to better experience this site.</p>
+<![endif]-->
+<div class='row'>
+  <div class='col-sm-9'>
+    <h2>Authentication</h2>
+    <div id="preamble">
+<div class="sectionbody">
+<div id="toc" class="toc">
+<div id="toctitle" class="title"></div>
+<ul class="sectlevel1">
+<li><a href="#overview">Overview</a></li>
+<li><a href="#users-and-groups">Users and Groups</a></li>
+<li><a href="#api-authentication">API Authentication</a>
+<ul class="sectlevel2">
+<li><a href="#authentication-impersonation">Impersonation</a></li>
+</ul>
+</li>
+<li><a href="#oauth">OAuth</a>
+<ul class="sectlevel2">
+<li><a href="#oauth-clients">OAuth Clients</a></li>
+<li><a href="#service-accounts-as-oauth-clients">Service Accounts as OAuth Clients</a></li>
+<li><a href="#integrations">Integrations</a></li>
+<li><a href="#oauth-server-metadata">OAuth Server Metadata</a></li>
+<li><a href="#obtaining-oauth-tokens">Obtaining OAuth Tokens</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="overview"><a class="anchor" href="#overview"></a>Overview</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The authentication layer identifies the user associated with requests to the
+Atomic Registry API. The authorization layer then uses information about the
+requesting user to determine if the request should be allowed.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="users-and-groups"><a class="anchor" href="#users-and-groups"></a>Users and Groups</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A <em>user</em> in Atomic Registry is an entity that can make requests to the
+Atomic Registry API. Typically, this represents the account of a developer or
+administrator that is interacting with Atomic Registry.</p>
+</div>
+<div class="paragraph">
+<p>A user can be assigned to one or more <em>groups</em>, each of which represent a
+certain set of users. Groups are useful when
+to grant permissions to multiple users at once, for example allowing
+access to <a href="../core_concepts/index.html#architecture-core-concepts-index">objects</a> within a
+<a href="../core_concepts/projects_and_users.html#projects">project</a>, versus granting
+them to users individually.</p>
+</div>
+<div class="paragraph">
+<p>In addition to explicitly defined groups, there are also
+system groups, or <em>virtual groups</em>, that are automatically provisioned by
+OpenShift.</p>
+</div>
+<div class="paragraph">
+<p>In the default set of virtual groups, note the following in
+particular:</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 28.5714%;">
+<col style="width: 71.4286%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Virtual Group</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>system:authenticated</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Automatically associated with all authenticated users.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>system:authenticated:oauth</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Automatically associated with all users authenticated with an OAuth access token.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>system:unauthenticated</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Automatically associated with all unauthenticated users.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="api-authentication"><a class="anchor" href="#api-authentication"></a>API Authentication</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Requests to the Atomic Registry API are authenticated using the following
+methods:</p>
+</div>
+<div class="dlist">
+<dl>
+<dt class="hdlist1">OAuth Access Tokens</dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Obtained from the Atomic Registry OAuth server using the <code><em>&lt;master&gt;</em>/oauth/authorize</code> and <code><em>&lt;master&gt;</em>/oauth/token</code> endpoints.</p>
+</li>
+<li>
+<p>Sent as an <code>Authorization: Bearer&#8230;&#8203;</code> header or an <code>access_token=&#8230;&#8203;</code> query parameter</p>
+</li>
+</ul>
+</div>
+</dd>
+<dt class="hdlist1">X.509 Client Certificates</dt>
+<dd>
+<div class="ulist">
+<ul>
+<li>
+<p>Requires a HTTPS connection to the API server.</p>
+</li>
+<li>
+<p>Verified by the API server against a trusted certificate authority bundle.</p>
+</li>
+<li>
+<p>The API server creates and distributes certificates to controllers to authenticate themselves.</p>
+</li>
+</ul>
+</div>
+</dd>
+</dl>
+</div>
+<div class="paragraph">
+<p>Any request with an invalid access token or an invalid certificate is rejected
+by the authentication layer with a 401 error.</p>
+</div>
+<div class="paragraph">
+<p>If no access token or certificate is presented, the authentication layer assigns
+the <code>system:anonymous</code> virtual user and the <code>system:unauthenticated</code> virtual
+group to the request. This allows the authorization layer to determine which
+requests, if any, an anonymous user is allowed to make.</p>
+</div>
+<div class="paragraph">
+<p>See the <a href="../../rest_api/index.html#rest-api-index">REST API Overview</a> for more information
+and examples.</p>
+</div>
+<div class="sect2">
+<h3 id="authentication-impersonation"><a class="anchor" href="#authentication-impersonation"></a>Impersonation</h3>
+<div class="paragraph">
+<p>A request to the Atomic Registry API may include an <strong>Impersonate-User</strong> header,
+which indicates that the requester wants to have the request handled as though
+it came from the specified user. This can be done on the command line by passing
+the <code><strong>--as=username</strong></code> flag.</p>
+</div>
+<div class="paragraph">
+<p>Before User A is allowed to impersonate User B, User A is first authenticated.
+Then, an authorization check occurs to ensure that User A is allowed to
+impersonate the user named User B. If User A is requesting to impersonate a
+service account (<strong>system:serviceaccount:namespace:name</strong>), Atomic Registry checks
+to ensure that User A can impersonate the <strong>serviceaccount</strong> named <strong>name</strong> in
+<strong>namespace</strong>. If the check fails, the request fails with a 403 (Forbidden) error
+code.</p>
+</div>
+<div class="paragraph">
+<p>By default, project administrators and editors are allowed to impersonate
+service accounts in their namespace. The <strong>sudoers</strong> role allows a user to
+impersonate <strong>system:admin</strong>, which in turn has cluster administrator permissions.
+This grants some protection against typos (but not security) for someone
+administering the cluster. For example, <code>oc delete nodes --all</code> would be
+forbidden, but <code>oc delete nodes --all --as=system:admin</code> would be allowed. You
+can add a user to that group using <code>oadm policy add-cluster-role-to-user sudoer
+&lt;username&gt;</code>.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="oauth"><a class="anchor" href="#oauth"></a>OAuth</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The Atomic Registry master includes a built-in OAuth server. Users obtain OAuth
+access tokens to authenticate themselves to the API.</p>
+</div>
+<div class="paragraph">
+<p>When a person requests a new OAuth token, the OAuth server uses the configured
+to determine the identity of the person making the request.</p>
+</div>
+<div class="paragraph">
+<p>It then determines what user that identity maps to, creates an access token for
+that user, and returns the token for use.</p>
+</div>
+<div class="sect2">
+<h3 id="oauth-clients"><a class="anchor" href="#oauth-clients"></a>OAuth Clients</h3>
+<div class="paragraph">
+<p>Every request for an OAuth token must specify the OAuth client that will
+receive and use the token. The following OAuth clients are automatically created
+when starting the Atomic Registry API:</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">OAuth Client</th>
+<th class="tableblock halign-left valign-top">Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>openshift-web-console</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Requests tokens for the web console.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>openshift-browser-client</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Requests tokens at <code><em>&lt;master&gt;</em>/oauth/token/request</code> with a user-agent that can handle interactive logins.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong>openshift-challenging-client</strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Requests tokens with a user-agent that can handle <code>WWW-Authenticate</code> challenges.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>To register additional clients:</p>
+</div>
+<div class="exampleblock">
+<div class="content">
+<div class="listingblock">
+<div class="content">
+<pre>$ oc create -f &lt;(echo '
+kind: OAuthClient
+apiVersion: v1
+metadata:
+ name: demo <i class="conum" data-value="1"></i><b>(1)</b>
+secret: "..." <i class="conum" data-value="2"></i><b>(2)</b>
+redirectURIs:
+ - "http://www.example.com/" <i class="conum" data-value="3"></i><b>(3)</b>
+grantMethod: prompt <i class="conum" data-value="4"></i><b>(4)</b>
+')</pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The <code>name</code> of the OAuth client is used as the <code>client_id</code> parameter when making requests to <code><em>&lt;master&gt;</em>/oauth/authorize</code> and <code><em>&lt;master&gt;</em>/oauth/token</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>The <code>secret</code> is used as the <code>client_secret</code> parameter when making requests to <code><em>&lt;master&gt;</em>/oauth/token</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>The <code>redirect_uri</code> parameter specified in requests to <code><em>&lt;master&gt;</em>/oauth/authorize</code> and <code><em>&lt;master&gt;</em>/oauth/token</code> must be equal to (or prefixed by) one of the URIs in <code>redirectURIs</code>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>The <code>grantMethod</code> is used to determine what action to take when this client requests tokens and has not yet been granted access by the user. Uses the same values seen in <a href="../../install_config/configuring_authentication.html#grant-options">Grant Options</a>.</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="service-accounts-as-oauth-clients"><a class="anchor" href="#service-accounts-as-oauth-clients"></a>Service Accounts as OAuth Clients</h3>
+<div class="paragraph">
+<p>A
+<a href="../../admin_guide/service_accounts.html#admin-guide-service-accounts">service
+account</a> can be used as a constrained form of OAuth client. Service accounts can
+only request a subset of
+<a href="../../admin_guide/scoped_tokens.html#admin-guide-scoped-tokens">scopes</a> that
+allow access to some basic user information and role-based power inside of the
+service account&#8217;s own namespace:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>user:info</code></p>
+</li>
+<li>
+<p><code>user:check-access</code></p>
+</li>
+<li>
+<p><code>role:&lt;any_role&gt;:&lt;serviceaccount_namespace&gt;</code></p>
+</li>
+<li>
+<p><code>role:&lt;any_role&gt;:&lt;serviceaccount_namespace&gt;:!</code></p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>When using a service account as an OAuth client:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>client_id</code> is <code>system:serviceaccount:&lt;serviceaccount_namespace&gt;:&lt;serviceaccount_name&gt;</code>.</p>
+</li>
+<li>
+<p><code>client_secret</code> can be any of the API tokens for that service account. For example:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ oc sa get-token &lt;serviceaccount_name&gt;</pre>
+</div>
+</div>
+</li>
+<li>
+<p>To get <code>WWW-Authenticate</code> challenges, set an
+<code>serviceaccounts.openshift.io/oauth-want-challenges</code> annotation on the service
+account to <strong>true</strong>.</p>
+</li>
+<li>
+<p><code>redirect_uri</code> must match an annotation on the service account.
+<a href="#redirect-uris-for-service-accounts">Redirect URIs for Service Accounts as
+OAuth Clients</a> provides more information.</p>
+</li>
+</ul>
+</div>
+<div class="sect3">
+<h4 id="redirect-uris-for-service-accounts"><a class="anchor" href="#redirect-uris-for-service-accounts"></a>Redirect URIs for Service Accounts as OAuth Clients</h4>
+<div class="paragraph">
+<p>Annotation keys must have the prefix
+<code>serviceaccounts.openshift.io/oauth-redirecturi.</code> or
+<code>serviceaccounts.openshift.io/oauth-redirectreference.</code> such as:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>serviceaccounts.openshift.io/oauth-redirecturi.&lt;name&gt;</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>In its simplest form, the annotation can be used to directly specify valid
+redirect URIs. For example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>"serviceaccounts.openshift.io/oauth-redirecturi.first":  "https://example.com"
+"serviceaccounts.openshift.io/oauth-redirecturi.second": "https://other.com"</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>first</code> and <code>second</code> postfixes in the above example are used to separate the
+two valid redirect URIs.</p>
+</div>
+<div class="paragraph">
+<p>In more complex configurations, static redirect URIs may not be enough. For
+example, perhaps you want all ingresses for a route to be considered valid. This
+is where dynamic redirect URIs via the
+<code>serviceaccounts.openshift.io/oauth-redirectreference.</code> prefix come into play.</p>
+</div>
+<div class="paragraph">
+<p>For example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>"serviceaccounts.openshift.io/oauth-redirectreference.first": "{\"kind\":\"OAuthRedirectReference\",\"apiVersion\":\"v1\",\"reference\":{\"kind\":\"Route\",\"name\":\"jenkins\"}}"</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Since the value for this annotation contains serialized JSON data, it is easier
+to see in an expanded format:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>{
+  "kind": "OAuthRedirectReference",
+  "apiVersion": "v1",
+  "reference": {
+    "kind": "Route",
+    "name": "jenkins"
+  }
+}</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Now you can see that an <code>OAuthRedirectReference</code> allows us to reference the
+route named <code>jenkins</code>. Thus, all ingresses for that route will now be considered
+valid.  The full specification for an <code>OAuthRedirectReference</code> is:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>{
+  "kind": "OAuthRedirectReference",
+  "apiVersion": "v1",
+  "reference": {
+    "kind": ..., <i class="conum" data-value="1"></i><b>(1)</b>
+    "name": ..., <i class="conum" data-value="2"></i><b>(2)</b>
+    "group": ... <i class="conum" data-value="3"></i><b>(3)</b>
+  }
+}</pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td><code>kind</code> refers to the type of the object being referenced. Currently, only <code>route</code> is supported.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td><code>name</code> refers to the name of the object. The object must be in the same namespace as the service account.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td><code>group</code> refers to the group of the object. Leave this blank, as the group for a route is the empty string.</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Both annotation prefixes can be combined to override the data provided by the
+reference object. For example:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>"serviceaccounts.openshift.io/oauth-redirecturi.first":  "custompath"
+"serviceaccounts.openshift.io/oauth-redirectreference.first": "{\"kind\":\"OAuthRedirectReference\",\"apiVersion\":\"v1\",\"reference\":{\"kind\":\"Route\",\"name\":\"jenkins\"}}"</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The <code>first</code> postfix is used to tie the annotations together. Assuming that the
+<code>jenkins</code> route had an ingress of <strong><em>https://example.com</em></strong>, now
+<strong><em>https://example.com/custompath</em></strong> is considered valid, but
+<strong><em>https://example.com</em></strong> is not.  The format for partially supplying override
+data is as follows:</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 66.6667%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Type</th>
+<th class="tableblock halign-left valign-top">Syntax</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div><div class="paragraph">
+<p>Scheme</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div><div class="paragraph">
+<p>"https://"</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div><div class="paragraph">
+<p>Hostname</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div><div class="paragraph">
+<p>"//website.com"</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div><div class="paragraph">
+<p>Port</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div><div class="paragraph">
+<p>"//:8000"</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div><div class="paragraph">
+<p>Path</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div><div class="paragraph">
+<p>"examplepath"</p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Specifying a host name override will replace the host name data from the
+referenced object, which is not likely to be desired behavior.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Any combination of the above syntax can be combined using the following format:</p>
+</div>
+<div class="paragraph">
+<p><code>&lt;scheme:&gt;//&lt;hostname&gt;&lt;:port&gt;/&lt;path&gt;</code></p>
+</div>
+<div class="paragraph">
+<p>The same object can be referenced more than once for more flexibility:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>"serviceaccounts.openshift.io/oauth-redirecturi.first":  "custompath"
+"serviceaccounts.openshift.io/oauth-redirectreference.first": "{\"kind\":\"OAuthRedirectReference\",\"apiVersion\":\"v1\",\"reference\":{\"kind\":\"Route\",\"name\":\"jenkins\"}}"
+"serviceaccounts.openshift.io/oauth-redirecturi.second":  "//:8000"
+"serviceaccounts.openshift.io/oauth-redirectreference.second": "{\"kind\":\"OAuthRedirectReference\",\"apiVersion\":\"v1\",\"reference\":{\"kind\":\"Route\",\"name\":\"jenkins\"}}"</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Assuming that the route named <code>jenkins</code> has an ingress of
+<strong><em>https://example.com</em></strong>, then both <strong><em>https://example.com:8000</em></strong> and
+<strong><em>https://example.com/custompath</em></strong> are considered valid.</p>
+</div>
+<div class="paragraph">
+<p>Static and dynamic annotations can be used at the same time to achieve the
+desired behavior:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>"serviceaccounts.openshift.io/oauth-redirectreference.first": "{\"kind\":\"OAuthRedirectReference\",\"apiVersion\":\"v1\",\"reference\":{\"kind\":\"Route\",\"name\":\"jenkins\"}}"
+"serviceaccounts.openshift.io/oauth-redirecturi.second": "https://other.com"</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="integrations"><a class="anchor" href="#integrations"></a>Integrations</h3>
+<div class="paragraph">
+<p>All requests for OAuth tokens involve a request to <code><em>&lt;master&gt;</em>/oauth/authorize</code>.
+Most authentication integrations place an authenticating proxy in front of this
+endpoint, or configure Atomic Registry to validate credentials against a backing
+Requests to <code><em>&lt;master&gt;</em>/oauth/authorize</code> can come from user-agents that cannot
+display interactive login pages, such as the CLI. Therefore, Atomic Registry
+supports authenticating using a <code>WWW-Authenticate</code> challenge in addition to
+interactive login flows.</p>
+</div>
+<div class="paragraph">
+<p>If an authenticating proxy is placed in front of the
+<code><em>&lt;master&gt;</em>/oauth/authorize</code> endpoint, it should send unauthenticated,
+non-browser user-agents <code>WWW-Authenticate</code> challenges, rather than displaying an
+interactive login page or redirecting to an interactive login flow.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>To prevent cross-site request forgery (CSRF) attacks against browser clients, Basic authentication challenges
+should only be sent if a <code>X-CSRF-Token</code> header is present on the request. Clients that expect
+to receive Basic <code>WWW-Authenticate</code> challenges should set this header to a non-empty value.</p>
+</div>
+<div class="paragraph">
+<p>If the authenticating proxy cannot support <code>WWW-Authenticate</code> challenges, or if
+Atomic Registry is configured to use an identity provider that does not support
+WWW-Authenticate challenges, users can visit <code><em>&lt;master&gt;</em>/oauth/token/request</code>
+using a browser to obtain an access token manually.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="oauth-server-metadata"><a class="anchor" href="#oauth-server-metadata"></a>OAuth Server Metadata</h3>
+<div class="paragraph">
+<p>Applications running in Atomic Registry may need to discover information about
+the built-in OAuth server. For example, they may need to discover what the
+address of the <code>&lt;master&gt;</code> server is without manual configuration.  To aid in
+this, Atomic Registry implements the IETF
+<a href="https://tools.ietf.org/html/draft-ietf-oauth-discovery-04">OAuth 2.0
+Authorization Server Metadata</a> draft specification.</p>
+</div>
+<div class="paragraph">
+<p>Thus, any application running inside the cluster can issue a <code>GET</code> request to
+<strong><em>https://openshift.default.svc/.well-known/oauth-authorization-server</em></strong> to fetch
+the following information:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>{
+  "issuer": "https://&lt;master&gt;", <i class="conum" data-value="1"></i><b>(1)</b>
+  "authorization_endpoint": "https://&lt;master&gt;/oauth/authorize", <i class="conum" data-value="2"></i><b>(2)</b>
+  "token_endpoint": "https://&lt;master&gt;/oauth/token", <i class="conum" data-value="3"></i><b>(3)</b>
+  "scopes_supported": [ <i class="conum" data-value="4"></i><b>(4)</b>
+    "user:full",
+    "user:info",
+    "user:check-access",
+    "user:list-scoped-projects",
+    "user:list-projects"
+  ],
+  "response_types_supported": [ <i class="conum" data-value="5"></i><b>(5)</b>
+    "code",
+    "token"
+  ],
+  "grant_types_supported": [ <i class="conum" data-value="6"></i><b>(6)</b>
+    "authorization_code",
+    "implicit"
+  ],
+  "code_challenge_methods_supported": [ <i class="conum" data-value="7"></i><b>(7)</b>
+    "plain",
+    "S256"
+  ]
+}</pre>
+</div>
+</div>
+<div class="colist arabic">
+<table>
+<tr>
+<td><i class="conum" data-value="1"></i><b>1</b></td>
+<td>The authorization server&#8217;s issuer identifier, which is a URL that uses the
+<code>https</code> scheme and has no query or fragment components. This is the location
+where <code>.well-known</code> <a href="https://tools.ietf.org/html/rfc5785">RFC 5785</a> resources
+containing information about the authorization server are published.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="2"></i><b>2</b></td>
+<td>URL of the authorization server&#8217;s authorization endpoint. See
+<a href="https://tools.ietf.org/html/rfc6749">RFC 6749</a>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="3"></i><b>3</b></td>
+<td>URL of the authorization server&#8217;s token endpoint. See
+<a href="https://tools.ietf.org/html/rfc6749">RFC 6749</a>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="4"></i><b>4</b></td>
+<td>JSON array containing a list of the OAuth 2.0
+<a href="https://tools.ietf.org/html/rfc6749">RFC 6749</a> scope values that this
+authorization server supports. Note that not all supported scope values are
+advertised.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="5"></i><b>5</b></td>
+<td>JSON array containing a list of the OAuth 2.0 <code>response_type</code> values that this
+authorization server supports. The array values used are the same as those used
+with the <code>response_types</code> parameter defined by "OAuth 2.0 Dynamic Client
+Registration Protocol" in <a href="https://tools.ietf.org/html/rfc7591">RFC 7591</a>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="6"></i><b>6</b></td>
+<td>JSON array containing a list of the OAuth 2.0 grant type values that this
+authorization server supports. The array values used are the same as those used
+with the <code>grant_types</code> parameter defined by <strong>OAuth 2.0 Dynamic Client
+Registration Protocol</strong> in <a href="https://tools.ietf.org/html/rfc7591">RFC 7591</a>.</td>
+</tr>
+<tr>
+<td><i class="conum" data-value="7"></i><b>7</b></td>
+<td>JSON array containing a list of PKCE
+<a href="https://tools.ietf.org/html/rfc7636">RFC 7636</a> code challenge methods
+supported by this authorization server. Code challenge method values are used in
+the <code>code_challenge_method</code> parameter defined in
+<a href="https://tools.ietf.org/html/rfc7636#section-4.3">Section 4.3 of RFC 7636</a>.
+The valid code challenge method values are those registered in the IANA <strong>PKCE
+Code Challenge Methods</strong> registry.  See
+<a href="http://www.iana.org/assignments/oauth-parameters">IANA OAuth Parameters</a>.</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="obtaining-oauth-tokens"><a class="anchor" href="#obtaining-oauth-tokens"></a>Obtaining OAuth Tokens</h3>
+<div class="paragraph">
+<p>The OAuth server supports standard
+<a href="https://tools.ietf.org/html/rfc6749#section-4.1">authorization code grant</a>
+and the <a href="https://tools.ietf.org/html/rfc6749#section-4.2">implicit grant</a>
+OAuth authorization flows.</p>
+</div>
+<div class="paragraph">
+<p>When requesting an OAuth token using the implicit grant flow
+(<code>response_type=token</code>) with a client_id configured to request <code>WWW-Authenticate
+challenges</code> (like <code>openshift-challenging-client</code>), these are the possible server
+responses from <code>/oauth/authorize</code>, and how they should be handled:</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 11.1111%;">
+<col style="width: 44.4444%;">
+<col style="width: 44.4445%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Status</th>
+<th class="tableblock halign-left valign-top">Content</th>
+<th class="tableblock halign-left valign-top">Client response</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><div><div class="paragraph">
+<p>302</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div><div class="paragraph">
+<p><code>Location</code> header containing an <code>access_token</code> parameter in the URL fragment (<a href="https://tools.ietf.org/html/rfc6749#section-4.2.2">RFC 4.2.2</a>)</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div><div class="paragraph">
+<p>Use the <code>access_token</code> value as the OAuth token</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div><div class="paragraph">
+<p>302</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div><div class="paragraph">
+<p><code>Location</code> header containing an <code>error</code> query parameter (<a href="https://tools.ietf.org/html/rfc6749#section-4.1.2.1">RFC 4.1.2.1</a>)</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div><div class="paragraph">
+<p>Fail, optionally surfacing the <code>error</code> (and optional <code>error_description</code>) query values to the user</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div><div class="paragraph">
+<p>302</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div><div class="paragraph">
+<p>Other <code>Location</code> header</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div><div class="paragraph">
+<p>Follow the redirect, and process the result using these rules</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div><div class="paragraph">
+<p>401</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div><div class="paragraph">
+<p><code>WWW-Authenticate</code> header present</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div><div class="paragraph">
+<p>Respond to challenge if type is recognized (e.g. <code>Basic</code>, <code>Negotiate</code>, etc), resubmit request, and process the result using these rules</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div><div class="paragraph">
+<p>401</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div><div class="paragraph">
+<p><code>WWW-Authenticate</code> header missing</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div><div class="paragraph">
+<p>No challenge authentication is possible. Fail and show response body (which might contain links or details on alternate methods to obtain an OAuth token)</p>
+</div></div></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><div><div class="paragraph">
+<p>Other</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div><div class="paragraph">
+<p>Other</p>
+</div></div></td>
+<td class="tableblock halign-left valign-top"><div><div class="paragraph">
+<p>Fail, optionally surfacing response body to the user</p>
+</div></div></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+  </div>
+
+  <div class='col-sm-3 hidden-print'>
+    <h2>Atomic Registry</h2>
+    <nav role='navigation'>
+      <ul class='docbrowser nav nav-vertical'>
+        <li class='disabled'>
+          <h3>Quickstart</h3>
+        </li>
+              <li role="menuitem" class=""><a href="../../registry_quickstart/index.html">Overview</a></li>
+              <li role="menuitem" class=""><a href="../../registry_quickstart/developers.html">Developers</a></li>
+            <!-- <li role="menuitem"><a>Administrators</a></li> -->
+            <li role="menuitem" class="">
+              <a class="" href="javascript:void(0);" data-toggle="collapse" data-target="#topicSubGroup-0-2">
+                <span id="sgSpan-0-2" class="fa fa-caret-right"></span>&nbsp;Administrators
+              </a>
+              <ul id="topicSubGroup-0-2" class="nav-tertiary list-unstyled collapse">
+
+                  <li class="">&nbsp;<a role="menuitem" href="../../registry_quickstart/administrators/index.html">Overview</strong></a><li>
+
+                  <li class="">&nbsp;<a role="menuitem" href="../../registry_quickstart/administrators/system_configuration.html">System Configuration</strong></a><li>
+
+                  <li class="">&nbsp;<a role="menuitem" href="../../registry_quickstart/administrators/uninstall.html">Uninstall</strong></a><li>
+              </ul>
+            </li>
+        <li class='disabled'>
+          <h3>Architecture</h3>
+        </li>
+              <li role="menuitem" class=""><a href="../../architecture/index.html">Overview</a></li>
+            <!-- <li role="menuitem"><a>Infrastructure Components</a></li> -->
+            <li role="menuitem" class="">
+              <a class="" href="javascript:void(0);" data-toggle="collapse" data-target="#topicSubGroup-1-1">
+                <span id="sgSpan-1-1" class="fa fa-caret-right"></span>&nbsp;Infrastructure Components
+              </a>
+              <ul id="topicSubGroup-1-1" class="nav-tertiary list-unstyled collapse">
+
+                  <li class="">&nbsp;<a role="menuitem" href="../../architecture/infrastructure_components/kubernetes_infrastructure.html">Kubernetes Infrastructure</strong></a><li>
+
+                  <li class="">&nbsp;<a role="menuitem" href="../../architecture/infrastructure_components/image_registry.html">Container Registry</strong></a><li>
+
+                  <li class="">&nbsp;<a role="menuitem" href="../../architecture/infrastructure_components/web_console.html">Web Console</strong></a><li>
+              </ul>
+            </li>
+            <!-- <li role="menuitem"><a>Core Concepts</a></li> -->
+            <li role="menuitem" class="">
+              <a class="" href="javascript:void(0);" data-toggle="collapse" data-target="#topicSubGroup-1-2">
+                <span id="sgSpan-1-2" class="fa fa-caret-right"></span>&nbsp;Core Concepts
+              </a>
+              <ul id="topicSubGroup-1-2" class="nav-tertiary list-unstyled collapse">
+
+                  <li class="">&nbsp;<a role="menuitem" href="../../architecture/core_concepts/containers_and_images.html">Images</strong></a><li>
+
+                  <li class="">&nbsp;<a role="menuitem" href="../../architecture/core_concepts/projects_and_users.html">Projects and Users</strong></a><li>
+
+                  <li class="">&nbsp;<a role="menuitem" href="../../architecture/core_concepts/builds_and_image_streams.html">Image Streams</strong></a><li>
+
+                  <li class="">&nbsp;<a role="menuitem" href="../../architecture/core_concepts/routes.html">Routes</strong></a><li>
+              </ul>
+            </li>
+            <!-- <li role="menuitem"><a>Additional Concepts</a></li> -->
+            <li role="menuitem" class="">
+              <a class="" href="javascript:void(0);" data-toggle="collapse" data-target="#topicSubGroup-1-3">
+                <span id="sgSpan-1-3" class="fa fa-caret-down"></span>&nbsp;Additional Concepts
+              </a>
+              <ul id="topicSubGroup-1-3" class="nav-tertiary list-unstyled collapse in">
+
+                  <li class=" active">&nbsp;<a role="menuitem" href="../../architecture/additional_concepts/authentication.html">Authentication</strong></a><li>
+
+                  <li class="">&nbsp;<a role="menuitem" href="../../architecture/additional_concepts/authorization.html">Authorization</strong></a><li>
+
+                  <li class="">&nbsp;<a role="menuitem" href="../../architecture/additional_concepts/other_api_objects.html">Other API Objects</strong></a><li>
+              </ul>
+            </li>
+        <li class='disabled'>
+          <h3>Installation and Configuration</h3>
+        </li>
+              <li role="menuitem" class=""><a href="../../install_config/adding_hosts_to_existing_cluster.html">Adding Hosts to an Existing Cluster</a></li>
+              <li role="menuitem" class=""><a href="../../install_config/certificate_customization.html">Configuring Custom Certificates</a></li>
+              <li role="menuitem" class=""><a href="../../install_config/redeploying_certificates.html">Redeploying Certificates</a></li>
+              <li role="menuitem" class=""><a href="../../install_config/configuring_authentication.html">Configuring Authentication and User Agent</a></li>
+              <li role="menuitem" class=""><a href="../../install_config/syncing_groups_with_ldap.html">Syncing Groups With LDAP</a></li>
+            <!-- <li role="menuitem"><a>Advanced LDAP Configuration</a></li> -->
+            <li role="menuitem" class="">
+              <a class="" href="javascript:void(0);" data-toggle="collapse" data-target="#topicSubGroup-2-5">
+                <span id="sgSpan-2-5" class="fa fa-caret-right"></span>&nbsp;Advanced LDAP Configuration
+              </a>
+              <ul id="topicSubGroup-2-5" class="nav-tertiary list-unstyled collapse">
+
+                  <li class="">&nbsp;<a role="menuitem" href="../../install_config/advanced_ldap_configuration/index.html">Overview</strong></a><li>
+
+                  <li class="">&nbsp;<a role="menuitem" href="../../install_config/advanced_ldap_configuration/sssd_for_ldap_failover.html">Setting up SSSD for LDAP Failover</strong></a><li>
+
+                  <li class="">&nbsp;<a role="menuitem" href="../../install_config/advanced_ldap_configuration/configuring_form_based_authentication.html">Configuring Form-Based Authentication</strong></a><li>
+
+                  <li class="">&nbsp;<a role="menuitem" href="../../install_config/advanced_ldap_configuration/configuring_extended_ldap_attributes.html">Configuring Extended LDAP Attributes</strong></a><li>
+              </ul>
+            </li>
+              <li role="menuitem" class=""><a href="../../install_config/web_console_customization.html">Customizing the Web Console</a></li>
+        <li class='disabled'>
+          <h3>Cluster Administration</h3>
+        </li>
+              <li role="menuitem" class=""><a href="../../admin_guide/index.html">Overview</a></li>
+              <li role="menuitem" class=""><a href="../../admin_guide/manage_users.html">Managing Users</a></li>
+              <li role="menuitem" class=""><a href="../../admin_guide/managing_projects.html">Managing Projects</a></li>
+              <li role="menuitem" class=""><a href="../../admin_guide/managing_pods.html">Managing Pods</a></li>
+              <li role="menuitem" class=""><a href="../../admin_guide/managing_networking.html">Managing Networking</a></li>
+              <li role="menuitem" class=""><a href="../../admin_guide/service_accounts.html">Configuring Service Accounts</a></li>
+              <li role="menuitem" class=""><a href="../../admin_guide/manage_authorization_policy.html">Managing Authorization Policies</a></li>
+              <li role="menuitem" class=""><a href="../../admin_guide/image_policy.html">Image Policy</a></li>
+              <li role="menuitem" class=""><a href="../../admin_guide/scoped_tokens.html">Scoped Tokens</a></li>
+              <li role="menuitem" class=""><a href="../../admin_guide/quota.html">Setting Quotas</a></li>
+              <li role="menuitem" class=""><a href="../../admin_guide/multiproject_quota.html">Setting Multi-Project Quotas</a></li>
+              <li role="menuitem" class=""><a href="../../admin_guide/limits.html">Setting Limit Ranges</a></li>
+              <li role="menuitem" class=""><a href="../../admin_guide/allocating_node_resources.html">Allocating Node Resources</a></li>
+              <li role="menuitem" class=""><a href="../../admin_guide/tcp_ingress_external_ports.html">Assigning Unique External IPs for Ingress Traffic</a></li>
+              <li role="menuitem" class=""><a href="../../admin_guide/seccomp.html">Restricting Application Capabilities Using Seccomp</a></li>
+              <li role="menuitem" class=""><a href="../../admin_guide/backup_restore.html">Backup and Restore</a></li>
+              <li role="menuitem" class=""><a href="../../admin_guide/idling_applications.html">Idling Applications</a></li>
+        <li class='disabled'>
+          <h3>User Guide</h3>
+        </li>
+              <li role="menuitem" class=""><a href="../../dev_guide/index.html">Overview</a></li>
+              <li role="menuitem" class=""><a href="../../dev_guide/authentication.html">Authentication</a></li>
+              <li role="menuitem" class=""><a href="../../dev_guide/managing_images.html">Managing Images</a></li>
+              <li role="menuitem" class=""><a href="../../dev_guide/service_accounts.html">Service Accounts</a></li>
+        <li class='disabled'>
+          <h3>CLI Reference</h3>
+        </li>
+              <li role="menuitem" class=""><a href="../../cli_reference/index.html">Overview</a></li>
+              <li role="menuitem" class=""><a href="../../cli_reference/get_started_cli.html">Get Started with the CLI</a></li>
+              <li role="menuitem" class=""><a href="../../cli_reference/manage_cli_profiles.html">Managing CLI Profiles</a></li>
+        <li class='disabled'>
+          <h3>REST API Reference</h3>
+        </li>
+              <li role="menuitem" class=""><a href="../../rest_api/index.html">Overview</a></li>
+              <li role="menuitem" class=""><a href="../../rest_api/openshift_v1.html">OpenShift v1</a></li>
+              <li role="menuitem" class=""><a href="../../rest_api/kubernetes_v1.html">Kubernetes v1</a></li>
+</ul>
+    </nav>
+  </div>
+</div>
+</section>
+</div>
+<div class='row'>
+<div class='col-md-offset-3 col-md-9 col-lg-offset-2 col-lg-10' id='footer'>
+  <footer>
+<hr class='visible-print'>
+
+&copy; 2014&ndash;2016 Project Atomic. Sponsored by Red Hat, Inc.
+<div class='edit-this-page pull-right'>
+<a href="https://github.com/openshift/openshift-docs#contributing-to-openshift-documentation"><i class="icon fa fa-fw fa-github"></i>Edit this page on GitHub</a>
+</div>
+        <script type="text/javascript">
+        var _paq = _paq || [];
+        _paq.push(['trackPageView']);
+        _paq.push(['enableLinkTracking']);
+        (function() {
+        var u=(("https:" == document.location.protocol) ? "https" : "http") + "://piwik-osasteam.rhcloud.com/piwik/";
+        _paq.push(['setTrackerUrl', u+'piwik.php']);
+        _paq.push(['setSiteId', 4]);
+        var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0]; g.type='text/javascript';
+        g.defer=true; g.async=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+        })();
+        </script>
+<noscript><p><img src="https://piwik-osasteam.rhcloud.com/piwik/piwik.php?idsite=4" style="border:0;" alt="" /></p></noscript>
+</footer>
+</div>
+</div>
+
+</section>
+
+<script src="http://www.projectatomic.io/javascripts/application.js" type="text/javascript"></script>
+
+
+</body>
+</html>

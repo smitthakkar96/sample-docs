@@ -1,0 +1,1588 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js lt-ie10 lt-ie9 lt-ie8 lt-ie7" lang="en-us"> <![endif]-->
+<!--[if IE 7]> <html class="no-js lt-ie10 lt-ie9 lt-ie8" lang="en-us"> <![endif]-->
+<!--[if IE 8]> <html class="no-js lt-ie10 lt-ie9" lang="en-us"> <![endif]-->
+<!--[if IE 9]> <html class="no-js lt-ie10 lt-ie9" lang="en-us"> <![endif]-->
+<!--[if lt IE 10]> <html class="no-js lt-ie10" lang="en-us"> <![endif]-->
+<!--[if !IE]> > <![endif]-->
+<html class='no-js' lang='en'>
+<!-- <![endif] -->
+<head>
+<title>Atomic Registry Latest | Cluster Administration | Backup and Restore</title>
+<meta charset='utf-8'>
+<meta content='' name='description'>
+<meta content='Project Atomic. Sponsored by Red Hat, Inc.' name='author'>
+<meta content='initial-scale=1.0,user-scalable=no,maximum-scale=1,width=device-width' name='viewport'>
+
+<link href='http://www.projectatomic.io/images/favicon.ico' rel='shortcut icon'>
+<link href='http://www.projectatomic.io/images/apple-touch-icon-precomposed.png' rel='apple-touch-icon-precomposed'>
+<link href='http://www.projectatomic.io/images/apple-touch-icon-57x57-precomposed.png' rel='apple-touch-icon-precomposed' sizes='57x57'>
+<link href='http://www.projectatomic.io/images/apple-touch-icon-72x72-precomposed.png' rel='apple-touch-icon-precomposed' sizes='72x72'>
+<link href='http://www.projectatomic.io/images/apple-touch-icon-114x114-precomposed.png' rel='apple-touch-icon-precomposed' sizes='114x114'>
+<link href='http://www.projectatomic.io/blog/feed.xml' rel='alternate' title='Project Atomic' type='application/atom+xml'>
+<link href="http://www.projectatomic.io/stylesheets/application.css" rel="stylesheet" type="text/css" />
+<link href="http://www.projectatomic.io/stylesheets/print.css" rel="stylesheet" type="text/css" media="print" />
+</head>
+<body class=' docs docs_introduction docs_introduction_index source-md'>
+<section class='container' id='page-wrap'>
+  <div class='row'>
+  <div class='col-md-3 col-lg-2' id='sidebar'>
+    <div id='nav-primary'>
+      <nav class='navbar navbar-default' role='navigation'>
+        <div class='navbar-header'>
+          <button class='navbar-toggle' data-target='.navbar-ex1-collapse' data-toggle='collapse'>
+            <span class='sr-only'>
+              Toggle navigation
+            </span>
+            <span class='icon-bar'></span>
+            <span class='icon-bar'></span>
+            <span class='icon-bar'></span>
+          </button>
+          <a class='navbar-brand' href='http://www.projectatomic.io/'>
+            Project Atomic
+          </a>
+        </div>
+        <div class='collapse navbar-collapse navbar-ex1-collapse'>
+          <ul class='nav navbar-nav'>
+            <li><a class="get-started" href="http://www.projectatomic.io/download">Get Started</a></li>
+            <li><a class="documentation" href="http://www.projectatomic.io/docs">Documentation</a></li>
+            <li><a class="developer-community" href="http://www.projectatomic.io/community">Developer Community</a></li>
+            <li><a class="on-github" href="https://github.com/projectatomic/">On GitHub</a></li>
+            <li><a class="ask" href="http://ask.projectatomic.io/">Ask</a></li>
+            <li><a class="blog" href="http://www.projectatomic.io/blog">Blog</a></li>
+            <li><a class="twitter" href="http://www.twitter.com/projectatomic">Twitter</a></li>
+            <li><a class="facebook" href="https://www.facebook.com/projectatomic">Facebook</a></li>
+            <li><a class="google" href="https://plus.google.com/108727025270662383247/posts">Google+</a></li>
+            <li><a class="rss" href="http://www.projectatomic.io/blog/feed.xml">RSS</a></li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+  </div>
+
+<section class='col-lg-10 col-md-9 container-fluid' id='content'>
+<!--[if lt IE 7]>
+<p class="chromeframe">You are using an outdated browser.
+<a href="http://browsehappy.com/">Upgrade your browser today</a> or
+<a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to better experience this site.</p>
+<![endif]-->
+<div class='row'>
+  <div class='col-sm-9'>
+    <h2>Backup and Restore</h2>
+    <div id="preamble">
+<div class="sectionbody">
+<div id="toc" class="toc">
+<div id="toctitle" class="title"></div>
+<ul class="sectlevel1">
+<li><a href="#overview">Overview</a></li>
+<li><a href="#backup-restore-prerequisites">Prerequisites</a></li>
+<li><a href="#cluster-backup">Cluster Backup</a></li>
+<li><a href="#cluster-restore-single-member-etcd-clusters">Cluster Restore for Single-member etcd Clusters</a></li>
+<li><a href="#cluster-restore-multiple-member-etcd-clusters">Cluster Restore for Multiple-member etcd Clusters</a>
+<ul class="sectlevel2">
+<li><a href="#restoring-embedded-etcd">Embedded etcd</a></li>
+<li><a href="#restoring-external-etcd">External etcd</a></li>
+</ul>
+</li>
+<li><a href="#backup-restore-adding-etcd-hosts">Adding New etcd Hosts</a></li>
+<li><a href="#bringing-openshift-services-back-online">Bringing Atomic Registry Services Back Online</a></li>
+<li><a href="#project-backup">Project Backup</a>
+<ul class="sectlevel2">
+<li><a href="#backup-rolebindings">Role Bindings</a></li>
+<li><a href="#backup-serviceaccounts">Service Accounts</a></li>
+<li><a href="#backup-secrets">Secrets</a></li>
+<li><a href="#backup-pvc">Persistent Volume Claims</a></li>
+</ul>
+</li>
+<li><a href="#project-restore">Project Restore</a></li>
+<li><a href="#backup-application-data">Application Data Backup</a></li>
+<li><a href="#restore-application-data">Application Data Restore</a></li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="overview"><a class="anchor" href="#overview"></a>Overview</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In Atomic Registry, you can <em>back up</em> (saving state to separate storage) and
+<em>restore</em> (recreating state from separate storage) at the cluster level. There
+is also some preliminary support for <a href="#project-backup">per-project backup</a>.
+The full state of a cluster installation includes:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>etcd data on each master</p>
+</li>
+<li>
+<p>API objects</p>
+</li>
+<li>
+<p>registry storage</p>
+</li>
+<li>
+<p>volume storage</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>This topic does not cover how to back up and restore
+<a href="../install_config/persistent_storage/index.html#install-config-persistent-storage-index">persistent
+storage</a>, as those topics are left to the underlying storage provider. However,
+an example of how to perform a <strong>generic</strong> backup of
+<a href="#backup-application-data">application data</a> is provided.</p>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>This topic only provides a generic way of backing up applications and the
+Atomic Registry cluster. It can not take into account custom requirements.
+Therefore, you should create a full backup and restore procedure. To prevent
+data loss, necessary precautions should be taken.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="backup-restore-prerequisites"><a class="anchor" href="#backup-restore-prerequisites"></a>Prerequisites</h2>
+<div class="sectionbody">
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Because the restore procedure involves a complete
+reinstallation, save all the files used in the initial installation. This may
+include:</p>
+<div class="ulist">
+<ul>
+<li>
+<p><strong><em>~/.config/openshift/installer.cfg.yml</em></strong> (from the
+<a href="../install_config/install/quick_install.html#install-config-install-quick-install">Quick Installation</a>
+method)</p>
+</li>
+<li>
+<p>Ansible playbooks and inventory files (from the
+<a href="../install_config/install/advanced_install.html#install-config-install-advanced-install">Advanced
+Installation</a> method)</p>
+</li>
+<li>
+<p><strong><em>/etc/yum.repos.d/ose.repo</em></strong> (from the
+<a href="../install_config/install/disconnected_install.html#install-config-install-disconnected-install">Disconnected
+Installation</a> method)</p>
+</li>
+</ul>
+</div>
+</li>
+<li>
+<p>Backup the procedures for post-installation steps. Some installations may
+involve steps that are not included in the installer. This may include changes
+to the services outside of the control of Atomic Registry or the installation of
+extra services like monitoring agents.
+Additional configuration that is not supported yet by the advanced installer
+might also be affected, for example when using multiple authentication providers.</p>
+</li>
+<li>
+<p>Install packages that provide various utility commands:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap"># yum install etcd</pre>
+</div>
+</div>
+</li>
+<li>
+<p>If using a container-based installation, pull the etcd image instead:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap"># docker pull rhel7/etcd</pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Note the location of the <strong>etcd</strong> data directory (or <code>$ETCD_DATA_DIR</code> in the
+following sections), which depends on how <strong>etcd</strong> is deployed.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<colgroup>
+<col style="width: 33.3333%;">
+<col style="width: 66.6667%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Deployment Type</th>
+<th class="tableblock halign-left valign-top">Data Directory</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">all-in-one cluster</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><em>/var/lib/origin/openshift.local.etcd</em></strong></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">external etcd (not on master)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><em>/var/lib/etcd</em></strong></p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">embedded etcd (on master)</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><em>/var/lib/etcd</em></strong></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect1">
+<h2 id="cluster-backup"><a class="anchor" href="#cluster-backup"></a>Cluster Backup</h2>
+<div class="sectionbody">
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Save all the certificates and keys, on each master:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap"># cd /etc/origin/master
+# tar cf /tmp/certs-and-keys-$(hostname).tar *.key *.crt</pre>
+</div>
+</div>
+</li>
+<li>
+<p>If <strong>etcd</strong> is running on more than one host, stop it on each host:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap"># sudo systemctl stop etcd</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Although this step is not strictly necessary, doing so ensures that the <strong>etcd</strong>
+data is fully synchronized.</p>
+</div>
+</li>
+<li>
+<p>Create an <strong>etcd</strong> backup:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap"># etcdctl backup \
+    --data-dir $ETCD_DATA_DIR \
+    --backup-dir $ETCD_DATA_DIR.bak</pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>If <strong>etcd</strong> is running on more than one host,
+the various instances regularly synchronize their data,
+so creating a backup for one of them is sufficient.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>For a container-based installation, you must use <code>docker exec</code> to run <strong>etcdctl</strong>
+inside the container.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</li>
+<li>
+<p>Copy the <strong><em>db</em></strong> file over to the backup you created:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap">$ cp "$ETCD_DATA_DIR"/member/snap/db "$HOTDIR"/member/snap/db'</pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="cluster-restore-single-member-etcd-clusters"><a class="anchor" href="#cluster-restore-single-member-etcd-clusters"></a>Cluster Restore for Single-member etcd Clusters</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To restore the cluster:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Reinstall Atomic Registry.</p>
+<div class="paragraph">
+<p>This should be done in the
+<a href="../install_config/install/planning.html#installation-methods">same way</a> that
+Atomic Registry was previously installed.</p>
+</div>
+</li>
+<li>
+<p>Run all necessary post-installation steps.</p>
+</li>
+<li>
+<p>Restore the certificates and keys, on each master:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap"># cd /etc/origin/master
+# tar xvf /tmp/certs-and-keys-$(hostname).tar</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Restore from the <strong>etcd</strong> backup:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap"># mv $ETCD_DATA_DIR $ETCD_DATA_DIR.orig
+# cp -Rp $ETCD_DATA_DIR.bak $ETCD_DATA_DIR
+# chcon -R --reference $ETCD_DATA_DIR.orig $ETCD_DATA_DIR
+# chown -R etcd:etcd $ETCD_DATA_DIR</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Create the new single node cluster using etcd&#8217;s <code>--force-new-cluster</code> option.
+You can do this using the values from <strong><em>/etc/etcd/etcd.conf</em></strong>, or you can
+temporarily modify the <strong>systemd</strong> unit file and start the service normally.</p>
+<div class="paragraph">
+<p>To do so, edit the <strong><em>/usr/lib/systemd/system/etcd.service</em></strong> file, and add
+<code>--force-new-cluster</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap"># sed -i '/ExecStart/s/"$/  --force-new-cluster"/' /usr/lib/systemd/system/etcd.service
+# systemctl show etcd.service --property ExecStart --no-pager
+
+ExecStart=/bin/bash -c "GOMAXPROCS=$(nproc) /usr/bin/etcd --force-new-cluster"</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then, restart the <strong>etcd</strong> service:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap"># systemctl daemon-reload
+# systemctl start etcd</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Verify the <strong>etcd</strong> service started correctly, then re-edit the
+<strong><em>/usr/lib/systemd/system/etcd.service</em></strong> file and remove the
+<code>--force-new-cluster</code> option:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap"># sed -i '/ExecStart/s/ --force-new-cluster//' /usr/lib/systemd/system/etcd.service
+# systemctl show etcd.service --property ExecStart --no-pager
+
+ExecStart=/bin/bash -c "GOMAXPROCS=$(nproc) /usr/bin/etcd"</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Restart the <strong>etcd</strong> service, then verify the etcd cluster is running correctly
+and displays Atomic Registry&#8217;s configuration:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap"># systemctl daemon-reload
+# systemctl restart etcd</pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="cluster-restore-multiple-member-etcd-clusters"><a class="anchor" href="#cluster-restore-multiple-member-etcd-clusters"></a>Cluster Restore for Multiple-member etcd Clusters</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>When using an external etcd host, you must first restore the etcd backup
+by creating a new, single node etcd cluster. If using external etcd with
+multiple members, you must then also add any additional etcd members to the
+cluster one by one.</p>
+</div>
+<div class="paragraph">
+<p>However, the details of the restoration process differ between
+<a href="#restoring-embedded-etcd">embedded</a> and
+<a href="#restoring-external-etcd">external</a> etcd. See the following
+section and follow the relevant steps
+before
+<a href="#bringing-openshift-services-back-online">Bringing OpenShift
+Services Back Online</a>.</p>
+</div>
+<div class="sect2">
+<h3 id="restoring-embedded-etcd"><a class="anchor" href="#restoring-embedded-etcd"></a>Embedded etcd</h3>
+<div class="paragraph">
+<p>Restore your etcd backup and configuration:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Run the following on the master with the embedded etcd:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap"># ETCD_DIR=/var/lib/origin/openshift.local.etcd
+# mv $ETCD_DIR /var/lib/etcd.orig
+# cp -Rp /var/lib/origin/etcd-backup-&lt;timestamp&gt;/ $ETCD_DIR
+# chcon -R --reference /var/lib/etcd.orig/ $ETCD_DIR
+# chown -R etcd:etcd $ETCD_DIR</pre>
+</div>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>The <code>$ETCD_DIR</code> location differs between external and embedded etcd.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</li>
+<li>
+<p>Create the new, single node etcd cluster:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap"># etcd -data-dir=/var/lib/origin/openshift.local.etcd \
+    -force-new-cluster</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Verify etcd has started successfully by checking the output from the above
+command, which should look similar to the following near the end:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap">[...]
+2016-06-24 12:14:45.644073 I | etcdserver: starting server... [version: 2.2.5, cluster version: 2.2]
+[...]
+2016-06-24 12:14:46.834394 I | etcdserver: published {Name:default ClientURLs:[http://localhost:2379 http://localhost:4001]} to cluster 5580663a6e0002</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Shut down the process by running the following from a separate terminal:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap"># pkill etcd</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Continue to <a href="#bringing-openshift-services-back-online">Bringing
+Atomic Registry Services Back Online</a>.</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="restoring-external-etcd"><a class="anchor" href="#restoring-external-etcd"></a>External etcd</h3>
+<div class="paragraph">
+<p>Choose a system to be the initial etcd member, and restore its etcd backup and
+configuration:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Run the following on the etcd host:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap"># ETCD_DIR=/var/lib/etcd/
+# mv $ETCD_DIR /var/lib/etcd.orig
+# cp -Rp /var/lib/origin/etcd-backup-&lt;timestamp&gt;/ $ETCD_DIR
+# chcon -R --reference /var/lib/etcd.orig/ $ETCD_DIR
+# chown -R etcd:etcd $ETCD_DIR</pre>
+</div>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>The <code>$ETCD_DIR</code> location differs between external and embedded etcd.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</li>
+<li>
+<p>Restore your <strong><em>/etc/etcd/etcd.conf</em></strong> file from backup or <strong><em>.rpmsave</em></strong>.</p>
+</li>
+<li>
+<p>Create the new single node cluster using etcd&#8217;s <code>--force-new-cluster</code>
+option. You can do this with a long complex command using the values from
+<strong><em>/etc/etcd/etcd.conf</em></strong>, or you can temporarily modify the <strong>systemd</strong> unit file
+and start the service normally.</p>
+<div class="paragraph">
+<p>To do so, edit the <strong><em>/usr/lib/systemd/system/etcd.service</em></strong> file, and add
+<code>--force-new-cluster</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap"># sed -i '/ExecStart/s/"$/  --force-new-cluster"/' /usr/lib/systemd/system/etcd.service
+# systemctl show etcd.service --property ExecStart --no-pager
+
+ExecStart=/bin/bash -c "GOMAXPROCS=$(nproc) /usr/bin/etcd --force-new-cluster"</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then restart the <strong>etcd</strong> service:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap"># systemctl daemon-reload
+# systemctl start etcd</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Verify the <strong>etcd</strong> service started correctly, then re-edit the
+<strong><em>/usr/lib/systemd/system/etcd.service</em></strong> file and remove the
+<code>--force-new-cluster</code> option:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap"># sed -i '/ExecStart/s/ --force-new-cluster//' /usr/lib/systemd/system/etcd.service
+# systemctl show etcd.service --property ExecStart --no-pager
+
+ExecStart=/bin/bash -c "GOMAXPROCS=$(nproc) /usr/bin/etcd"</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Restart the <strong>etcd</strong> service, then verify the etcd cluster is running correctly
+and displays Atomic Registry&#8217;s configuration:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap"># systemctl daemon-reload
+# systemctl restart etcd
+# etcdctl --cert-file=/etc/etcd/peer.crt \
+    --key-file=/etc/etcd/peer.key \
+    --ca-file=/etc/etcd/ca.crt \
+    --peers="https://172.16.4.18:2379,https://172.16.4.27:2379" \
+    ls /</pre>
+</div>
+</div>
+</li>
+<li>
+<p>If you have additional etcd members to add to your cluster, continue to
+<a href="#adding-addtl-etcd-members">Adding Additional etcd Members</a>.
+Otherwise, if you only want a single node external etcd, continue to
+<a href="#bringing-openshift-services-back-online">Bringing Atomic Registry
+Services Back Online</a>.</p>
+</li>
+</ol>
+</div>
+<div class="sect3">
+<h4 id="adding-addtl-etcd-members"><a class="anchor" href="#adding-addtl-etcd-members"></a>Adding Additional etcd Members</h4>
+<div class="paragraph">
+<p>To add additional etcd members to the cluster, you must first adjust the default
+<strong>localhost</strong> peer in the <code><strong>peerURLs</strong></code> value for the first member:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Get the member ID for the first member using the <code>member list</code> command:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap"># etcdctl --cert-file=/etc/etcd/peer.crt \
+    --key-file=/etc/etcd/peer.key \
+    --ca-file=/etc/etcd/ca.crt \
+    --peers="https://172.18.1.18:2379,https://172.18.9.202:2379,https://172.18.0.75:2379" \
+    member list</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Update the value of <code><strong>peerURLs</strong></code> using the <code>etcdctl member update</code> command by
+passing the member ID obtained from the previous step:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap"># etcdctl --cert-file=/etc/etcd/peer.crt \
+    --key-file=/etc/etcd/peer.key \
+    --ca-file=/etc/etcd/ca.crt \
+    --peers="https://172.18.1.18:2379,https://172.18.9.202:2379,https://172.18.0.75:2379" \
+    member update 511b7fb6cc0001 https://172.18.1.18:2380</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Alternatively, you can use <code>curl</code>:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap"># curl --cacert /etc/etcd/ca.crt \
+    --cert /etc/etcd/peer.crt \
+    --key /etc/etcd/peer.key \
+    https://172.18.1.18:2379/v2/members/511b7fb6cc0001 \
+    -XPUT -H "Content-Type: application/json" \
+    -d '{"peerURLs":["https://172.18.1.18:2380"]}'</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Re-run the <code>member list</code> command and ensure the peer URLs no longer include
+<strong>localhost</strong>.</p>
+</li>
+<li>
+<p>Now, add each additional member to the cluster one at a time.</p>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Each member must be fully added and brought online one at a time. When adding
+each additional member to the cluster, the <code><strong>peerURLs</strong></code> list must be correct for
+that point in time, so it will grow by one for each member added. The <code>etcdctl
+member add</code> command will output the values that need to be set in the
+<strong><em>etcd.conf</em></strong> file as you add each member, as described in the following
+instructions.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>For each member, add it to the cluster using the values that can be found in
+that system&#8217;s <strong><em>etcd.conf</em></strong> file:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap"># etcdctl --cert-file=/etc/etcd/peer.crt \
+    --key-file=/etc/etcd/peer.key \
+    --ca-file=/etc/etcd/ca.crt \
+    --peers="https://172.16.4.18:2379,https://172.16.4.27:2379" \
+    member add 10.3.9.222 https://172.16.4.27:2380
+
+Added member named 10.3.9.222 with ID 4e1db163a21d7651 to cluster
+
+ETCD_NAME="10.3.9.222"
+ETCD_INITIAL_CLUSTER="10.3.9.221=https://172.16.4.18:2380,10.3.9.222=https://172.16.4.27:2380"
+ETCD_INITIAL_CLUSTER_STATE="existing"</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Using the environment variables provided in the output of the above <code>etcdctl
+member add</code> command, edit the <strong><em>/etc/etcd/etcd.conf</em></strong> file on the member system
+itself and ensure these settings match.</p>
+</li>
+<li>
+<p>Now start etcd on the new member:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap"># rm -rf /var/lib/etcd/member
+# systemctl enable etcd
+# systemctl start etcd</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Ensure the service starts correctly and the etcd cluster is now healthy:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap"># etcdctl --cert-file=/etc/etcd/peer.crt \
+    --key-file=/etc/etcd/peer.key \
+    --ca-file=/etc/etcd/ca.crt \
+    --peers="https://172.16.4.18:2379,https://172.16.4.27:2379" \
+    member list
+
+51251b34b80001: name=10.3.9.221 peerURLs=https://172.16.4.18:2380 clientURLs=https://172.16.4.18:2379
+d266df286a41a8a4: name=10.3.9.222 peerURLs=https://172.16.4.27:2380 clientURLs=https://172.16.4.27:2379
+
+# etcdctl --cert-file=/etc/etcd/peer.crt \
+    --key-file=/etc/etcd/peer.key \
+    --ca-file=/etc/etcd/ca.crt \
+    --peers="https://172.16.4.18:2379,https://172.16.4.27:2379" \
+    cluster-health
+
+cluster is healthy
+member 51251b34b80001 is healthy
+member d266df286a41a8a4 is healthy</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Now repeat this process for the next member to add to the cluster.</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>After all additional etcd members have been added, continue to
+<a href="#bringing-openshift-services-back-online">Bringing Atomic Registry
+Services Back Online</a>.</p>
+</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="backup-restore-adding-etcd-hosts"><a class="anchor" href="#backup-restore-adding-etcd-hosts"></a>Adding New etcd Hosts</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In cases where etcd members have failed and you still have a quorum of etcd
+cluster members running, you can use the surviving members to
+add additional etcd members without downtime.</p>
+</div>
+<div class="paragraph">
+<p><strong>Suggested Cluster Size</strong></p>
+</div>
+<div class="paragraph">
+<p>Having a cluster with an odd number of etcd hosts can account for fault
+tolerance. Having an odd number of etcd hosts does not change the number needed
+for a quorum, but increases the tolerance for failure. For example, a cluster
+size of three members, quorum is two leaving a failure tolerance of
+one. This ensures the cluster will continue to operate if two of the members are
+healthy.</p>
+</div>
+<div class="paragraph">
+<p>Having an in-production cluster of three etcd hosts is recommended.</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>The following presumes you have a backup of the <strong>/etc/etcd</strong> configuration for
+the etcd hosts.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>If the new etcd members will also be Atomic Registry nodes, see <a href="../install_config/adding_hosts_to_existing_cluster.html#install-config-adding-hosts-to-cluster">Add
+the desired number of hosts to the cluster</a>. The rest of this procedure presumes
+you have added just one host, but if adding multiple, perform all steps on each
+host.</p>
+</li>
+<li>
+<p>Upgrade etcd and iptables on the surviving nodes:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap"># yum update etcd iptables-services</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Ensure version <code>etcd-2.3.7-4.el7.x86_64</code> or greater is installed, and that the
+same version is installed on each host.</p>
+</div>
+</li>
+<li>
+<p>Install etcd and iptables on the new host</p>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap"># yum install etcd iptables-services</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Ensure version <code>etcd-2.3.7-4.el7.x86_64</code> or greater is installed, and that the
+same version is installed on the new host.</p>
+</div>
+</li>
+<li>
+<p><a href="#cluster-backup">Backup the etcd data store</a> on surviving hosts before making any cluster configuration changes.</p>
+</li>
+<li>
+<p>If replacing a failed etcd member, remove the failed member <em>before</em> adding the new member.</p>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap"># etcdctl -C https://&lt;surviving host IP&gt;:2379 \
+  --ca-file=/etc/etcd/ca.crt     \
+  --cert-file=/etc/etcd/peer.crt     \
+  --key-file=/etc/etcd/peer.key cluster-health
+
+# etcdctl -C https://&lt;surviving host IP&gt;:2379 \
+  --ca-file=/etc/etcd/ca.crt     \
+  --cert-file=/etc/etcd/peer.crt     \
+  --key-file=/etc/etcd/peer.key member remove &lt;failed member identifier&gt;</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Stop the etcd service on the failed etcd member:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap"># systemctl stop etcd</pre>
+</div>
+</div>
+</li>
+<li>
+<p>On the new host, add the appropriate iptables rules:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap"># systemctl enable iptables.service --now
+# iptables -N OS_FIREWALL_ALLOW
+# iptables -t filter -I INPUT -j OS_FIREWALL_ALLOW
+# iptables -A OS_FIREWALL_ALLOW -p tcp -m state \
+  --state NEW -m tcp --dport 2379 -j ACCEPT
+# iptables -A OS_FIREWALL_ALLOW -p tcp -m state \
+  --state NEW -m tcp --dport 2380 -j ACCEPT
+# iptables-save</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Generate the required certificates for the new host. On a surviving etcd host:</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>Make a backup of the <strong><em>/etc/etcd/ca/</em></strong> directory.</p>
+</li>
+<li>
+<p>Set the variables and working directory for the certificates, ensuring to create the <strong><em>PREFIX</em></strong> directory if one has not been created:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap"># cd /etc/etcd
+# export NEW_ETCD="&lt;NEW_HOST_NAME&gt;"
+
+# export CN=$NEW_ETCD
+# export SAN="IP:&lt;NEW_HOST_IP&gt;"
+# export PREFIX="./generated_certs/etcd-$CN/"</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Create the $PREFIX directory:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap">$ mkdir -p $PREFIX</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Create the <strong><em>server.csr</em></strong> and <strong><em>server.crt</em></strong> certificates:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap"># openssl req -new -keyout ${PREFIX}server.key \
+  -config ca/openssl.cnf \
+  -out ${PREFIX}server.csr \
+  -reqexts etcd_v3_req -batch -nodes \
+  -subj /CN=$CN
+
+# openssl ca -name etcd_ca -config ca/openssl.cnf \
+  -out ${PREFIX}server.crt \
+  -in ${PREFIX}server.csr \
+  -extensions etcd_v3_ca_server -batch</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Create the <strong><em>peer.csr</em></strong> and <strong><em>peer.crt</em></strong> certificates:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap"># openssl req -new -keyout ${PREFIX}peer.key \
+  -config ca/openssl.cnf \
+  -out ${PREFIX}peer.csr \
+  -reqexts etcd_v3_req -batch -nodes \
+  -subj /CN=$CN
+
+# openssl ca -name etcd_ca -config ca/openssl.cnf \
+  -out ${PREFIX}peer.crt \
+  -in ${PREFIX}peer.csr \
+  -extensions etcd_v3_ca_peer -batch</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Copy the <strong><em>etcd.conf</em></strong> and <strong><em>ca.crt</em></strong> files, and archive the contents of the directory:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap"># cp etcd.conf ${PREFIX}
+# cp ca.crt ${PREFIX}
+# tar -czvf ${PREFIX}${CN}.tgz -C ${PREFIX} .</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Transfer the files to the new etcd hosts:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap"># scp ${PREFIX}${CN}.tgz  $CN:/etc/etcd/</pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>While still on the surviving etcd host, add the new host to the cluster:</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>Add the new host to the cluster:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap"># export ETCD_CA_HOST="&lt;SURVIVING_ETCD_HOSTNAME&gt;"
+# export NEW_ETCD="&lt;NEW_ETCD_HOSTNAME&gt;"
+# export NEW_ETCD_IP="&lt;NEW_HOST_IP&gt;"
+
+# etcdctl -C https://${ETCD_CA_HOST}:2379 \
+  --ca-file=/etc/etcd/ca.crt     \
+  --cert-file=/etc/etcd/peer.crt     \
+  --key-file=/etc/etcd/peer.key member add ${NEW_ETCD} https://${NEW_ETCD_IP}:2380
+
+ETCD_NAME="&lt;NEW_ETCD_HOSTNAME&gt;"
+ETCD_INITIAL_CLUSTER="&lt;NEW_ETCD_HOSTNAME&gt;=https://&lt;NEW_HOST_IP&gt;:2380,&lt;SURVIVING_ETCD_HOST&gt;=https:/&lt;SURVIVING_HOST_IP&gt;:2380
+ETCD_INITIAL_CLUSTER_STATE="existing"</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Copy the three environment variables in the etcdctl member add output. They will be used later.</p>
+</div>
+</li>
+<li>
+<p>On the new host, extract the copied configuration data and set the permissions:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap"># tar -xf /etc/etcd/&lt;NEW_ETCD_HOSTNAME&gt;.tgz -C /etc/etcd/ --overwrite
+# chown -R etcd:etcd /etc/etcd/*</pre>
+</div>
+</div>
+</li>
+<li>
+<p>On the new host, remove any etcd data:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap"># rm -rf /var/lib/etcd/member
+# chown -R etcd:etcd /var/lib/etcd</pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>On the new etcd host&#8217;s <strong><em>etcd.conf</em></strong> file:</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>Replace the following with the values generated in the previous step:</p>
+<div class="ulist">
+<ul>
+<li>
+<p>ETCD_NAME</p>
+</li>
+<li>
+<p>ETCD_INITIAL_CLUSTER</p>
+</li>
+<li>
+<p>ETCD_INITIAL_CLUSTER_STATE</p>
+<div class="paragraph">
+<p>Replace the IP address with the "NEW_ETCD" value for:</p>
+</div>
+</li>
+<li>
+<p>ETCD_LISTEN_PEER_URLS</p>
+</li>
+<li>
+<p>ETCD_LISTEN_CLIENT_URLS</p>
+</li>
+<li>
+<p>ETCD_INITIAL_ADVERTISE_PEER_URLS</p>
+</li>
+<li>
+<p>ETCD_ADVERTISE_CLIENT_URLS</p>
+<div class="paragraph">
+<p>For replacing failed members, you will need to remove the failed hosts from the
+etcd configuration.</p>
+</div>
+</li>
+</ul>
+</div>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Start etcd on the new host:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap"># systemctl enable etcd --now</pre>
+</div>
+</div>
+</li>
+<li>
+<p>To verify that the new member has been added successfully:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap">etcdctl -C https://${ETCD_CA_HOST}:2379 --ca-file=/etc/etcd/ca.crt \
+  --cert-file=/etc/etcd/peer.crt     \
+  --key-file=/etc/etcd/peer.key cluster-health</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Update the master configuration on all masters to point to the new etcd host</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>On every master in the cluster, edit <strong><em>/etc/origin/master/master-config.yaml</em></strong></p>
+</li>
+<li>
+<p>Find the <strong>etcdClientInfo</strong> section.</p>
+</li>
+<li>
+<p>Add the new etcd host to the <strong>urls</strong> list.</p>
+</li>
+<li>
+<p>If a failed etcd host was replaced, remove it from the list.</p>
+</li>
+<li>
+<p>Restart the master API service.</p>
+<div class="paragraph">
+<p>On a single master cluster installation:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap"># systemctl restart atomic-openshift-master</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>On a multi-master cluster installation, on each master:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap"># systemctl restart atomic-openshift-master-api</pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>The procedure to add an etcd member is complete.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="bringing-openshift-services-back-online"><a class="anchor" href="#bringing-openshift-services-back-online"></a>Bringing Atomic Registry Services Back Online</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>On each Atomic Registry master, restore your master and node configuration from
+backup and enable and restart all relevant services.</p>
+</div>
+<div class="paragraph">
+<p>On the master in a single master cluster:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap"># cp /etc/sysconfig/atomic-openshift-master.rpmsave /etc/sysconfig/atomic-openshift-master
+# cp /etc/origin/master/master-config.yaml.&lt;timestamp&gt; /etc/origin/master/master-config.yaml
+# cp /etc/origin/node/node-config.yaml.&lt;timestamp&gt; /etc/origin/node/node-config.yaml
+# systemctl enable atomic-openshift-master
+# systemctl enable atomic-openshift-node
+# systemctl start atomic-openshift-master
+# systemctl start atomic-openshift-node</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>On each master in a multi-master cluster:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap"># cp /etc/sysconfig/atomic-openshift-master-api.rpmsave /etc/sysconfig/atomic-openshift-master-api
+# cp /etc/sysconfig/atomic-openshift-master-controllers.rpmsave /etc/sysconfig/atomic-openshift-master-controllers
+# cp /etc/origin/master/master-config.yaml.&lt;timestamp&gt; /etc/origin/master/master-config.yaml
+# cp /etc/origin/node/node-config.yaml.&lt;timestamp&gt; /etc/origin/node/node-config.yaml
+# systemctl enable atomic-openshift-master-api
+# systemctl enable atomic-openshift-master-controllers
+# systemctl enable atomic-openshift-node
+# systemctl start atomic-openshift-master-api
+# systemctl start atomic-openshift-master-controllers
+# systemctl start atomic-openshift-node</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>On each Atomic Registry node, restore your <strong><em>node-config.yaml</em></strong> file from backup
+and enable and restart the <strong>atomic-openshift-node</strong> service:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap"># cp /etc/origin/node/node-config.yaml.&lt;timestamp&gt; /etc/origin/node/node-config.yaml
+# systemctl enable atomic-openshift-node
+# systemctl start atomic-openshift-node</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Your Atomic Registry cluster should now be back online.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="project-backup"><a class="anchor" href="#project-backup"></a>Project Backup</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>A future release of Atomic Registry will feature specific support for
+per-project back up and restore.</p>
+</div>
+<div class="paragraph">
+<p>For now, to back up API objects at the project level, use <code>oc export</code> for each
+object to be saved. For example, to save the deployment configuration <code>frontend</code>
+in YAML format:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap">$ oc export dc frontend -o yaml &gt; dc-frontend.yaml</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To back up all of the project (with the exception of cluster objects like
+namespaces and projects):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap">$ oc export all -o yaml &gt; project.yaml</pre>
+</div>
+</div>
+<div class="sect2">
+<h3 id="backup-rolebindings"><a class="anchor" href="#backup-rolebindings"></a>Role Bindings</h3>
+<div class="paragraph">
+<p>Sometimes custom policy
+<a href="../admin_guide/manage_authorization_policy.html#managing-role-bindings">role
+bindings</a> are used in a project. For example, a project administrator can give
+another user a certain role in the project and grant that user project access.</p>
+</div>
+<div class="paragraph">
+<p>These role bindings can be exported:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap">$ oc get rolebindings -o yaml --export=true &gt; rolebindings.yaml</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="backup-serviceaccounts"><a class="anchor" href="#backup-serviceaccounts"></a>Service Accounts</h3>
+<div class="paragraph">
+<p>If custom service accounts are created in a project, these need to be exported:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap">$ oc get serviceaccount -o yaml --export=true &gt; serviceaccount.yaml</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="backup-secrets"><a class="anchor" href="#backup-secrets"></a>Secrets</h3>
+<div class="paragraph">
+<p>Custom secrets like source control management secrets (SSH Public Keys,
+Username/Password) should be exported if they are used:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap">$ oc get secret -o yaml --export=true &gt; secret.yaml</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="backup-pvc"><a class="anchor" href="#backup-pvc"></a>Persistent Volume Claims</h3>
+<div class="paragraph">
+<p>If the an application within a project uses a persistent volume through a
+persistent volume claim (PVC), these should be backed up:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap">$ oc get pvc -o yaml --export=true &gt; pvc.yaml</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="project-restore"><a class="anchor" href="#project-restore"></a>Project Restore</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>To restore a project, recreate the project and recreate all all of the objects
+that were exported during the backup:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap">$ oc new-project myproject
+$ oc create -f project.yaml
+$ oc create -f secret.yaml
+$ oc create -f serviceaccount.yaml
+$ oc create -f pvc.yaml
+$ oc create -f rolebindings.yaml</pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Some resources can fail to be created (for example, pods and default service
+accounts).</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="backup-application-data"><a class="anchor" href="#backup-application-data"></a>Application Data Backup</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>In many cases, application data can be backed up using the <code>oc rsync</code> command,
+assuming <code>rsync</code> is installed within the container image. The Red Hat <strong>rhel7</strong>
+base image does contain <code>rsync</code>. Therefore, all images that are based on <strong>rhel7</strong>
+contain it as well. See <a href="../cli_reference/basic_cli_operations.html#cli-operations-rsync">Troubleshooting and Debugging CLI Operations - rsync</a>.</p>
+</div>
+<div class="admonitionblock warning">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-warning" title="Warning"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>This is a <em>generic</em> backup of application data and does not take into account
+application-specific backup procedures, for example special export/import
+procedures for database systems.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Other means of backup may exist depending on the type of the persistent volume
+(for example, Cinder, NFS, Gluster, or others).</p>
+</div>
+<div class="paragraph">
+<p>The paths to back up are also <em>application specific</em>. You can determine
+what path to back up by looking at the <code><strong>mountPath</strong></code> for volumes in the
+<code><strong>deploymentconfig</strong></code>.</p>
+</div>
+<div class="olist arabic">
+<div class="title">Example of Backing up a Jenkins Deployment&#8217;s Application Data</div>
+<ol class="arabic">
+<li>
+<p>Get the application data <code><strong>mountPath</strong></code> from the <code><strong>deploymentconfig</strong></code>:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap">$ oc get dc/jenkins -o jsonpath='{ .spec.template.spec.containers[?(@.name=="jenkins")].volumeMounts[?(@.name=="jenkins-data")].mountPath }'
+/var/lib/jenkins</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Get the name of the pod that is currently running:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap">$ oc get pod --selector=deploymentconfig=jenkins -o jsonpath='{ .metadata.name }'
+jenkins-1-37nux</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Use the <code>oc rsync</code> command to copy application data:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap">$ oc rsync jenkins-1-37nux:/var/lib/jenkins /tmp/</pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>This type of application data backup can only be performed while an application
+pod is currently running.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="restore-application-data"><a class="anchor" href="#restore-application-data"></a>Application Data Restore</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The process for restoring application data is similar to the
+<a href="#backup-application-data">application backup procedure</a> using the <code>oc rsync</code>
+tool. The same restrictions apply and the process of restoring application data
+requires a persistent volume.</p>
+</div>
+<div class="olist arabic">
+<div class="title">Example of Restoring a Jenkins Deployment&#8217;s Application Data</div>
+<ol class="arabic">
+<li>
+<p>Verify the backup:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap">$ ls -la /tmp/jenkins-backup/
+total 8
+drwxrwxr-x.  3 user     user   20 Sep  6 11:14 .
+drwxrwxrwt. 17 root     root 4096 Sep  6 11:16 ..
+drwxrwsrwx. 12 user     user 4096 Sep  6 11:14 jenkins</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Use the <code>oc rsync</code> tool to copy the data into the running pod:</p>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap">$ oc rsync /tmp/jenkins-backup/jenkins jenkins-1-37nux:/var/lib</pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>Depending on the application, you may be required to restart the application.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</li>
+<li>
+<p>Restart the application with new data (<em>optional</em>):</p>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap">$ oc delete pod jenkins-1-37nux</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Alternatively, you can scale down the deployment to 0, and then up again:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="nowrap">$ oc scale --replicas=0 dc/jenkins
+$ oc scale --replicas=1 dc/jenkins</pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+  </div>
+
+  <div class='col-sm-3 hidden-print'>
+    <h2>Atomic Registry</h2>
+    <nav role='navigation'>
+      <ul class='docbrowser nav nav-vertical'>
+        <li class='disabled'>
+          <h3>Quickstart</h3>
+        </li>
+              <li role="menuitem" class=""><a href="../registry_quickstart/index.html">Overview</a></li>
+              <li role="menuitem" class=""><a href="../registry_quickstart/developers.html">Developers</a></li>
+            <!-- <li role="menuitem"><a>Administrators</a></li> -->
+            <li role="menuitem" class="">
+              <a class="" href="javascript:void(0);" data-toggle="collapse" data-target="#topicSubGroup-0-2">
+                <span id="sgSpan-0-2" class="fa fa-caret-right"></span>&nbsp;Administrators
+              </a>
+              <ul id="topicSubGroup-0-2" class="nav-tertiary list-unstyled collapse">
+
+                  <li class="">&nbsp;<a role="menuitem" href="../registry_quickstart/administrators/index.html">Overview</strong></a><li>
+
+                  <li class="">&nbsp;<a role="menuitem" href="../registry_quickstart/administrators/system_configuration.html">System Configuration</strong></a><li>
+
+                  <li class="">&nbsp;<a role="menuitem" href="../registry_quickstart/administrators/uninstall.html">Uninstall</strong></a><li>
+              </ul>
+            </li>
+        <li class='disabled'>
+          <h3>Architecture</h3>
+        </li>
+              <li role="menuitem" class=""><a href="../architecture/index.html">Overview</a></li>
+            <!-- <li role="menuitem"><a>Infrastructure Components</a></li> -->
+            <li role="menuitem" class="">
+              <a class="" href="javascript:void(0);" data-toggle="collapse" data-target="#topicSubGroup-1-1">
+                <span id="sgSpan-1-1" class="fa fa-caret-right"></span>&nbsp;Infrastructure Components
+              </a>
+              <ul id="topicSubGroup-1-1" class="nav-tertiary list-unstyled collapse">
+
+                  <li class="">&nbsp;<a role="menuitem" href="../architecture/infrastructure_components/kubernetes_infrastructure.html">Kubernetes Infrastructure</strong></a><li>
+
+                  <li class="">&nbsp;<a role="menuitem" href="../architecture/infrastructure_components/image_registry.html">Container Registry</strong></a><li>
+
+                  <li class="">&nbsp;<a role="menuitem" href="../architecture/infrastructure_components/web_console.html">Web Console</strong></a><li>
+              </ul>
+            </li>
+            <!-- <li role="menuitem"><a>Core Concepts</a></li> -->
+            <li role="menuitem" class="">
+              <a class="" href="javascript:void(0);" data-toggle="collapse" data-target="#topicSubGroup-1-2">
+                <span id="sgSpan-1-2" class="fa fa-caret-right"></span>&nbsp;Core Concepts
+              </a>
+              <ul id="topicSubGroup-1-2" class="nav-tertiary list-unstyled collapse">
+
+                  <li class="">&nbsp;<a role="menuitem" href="../architecture/core_concepts/containers_and_images.html">Images</strong></a><li>
+
+                  <li class="">&nbsp;<a role="menuitem" href="../architecture/core_concepts/projects_and_users.html">Projects and Users</strong></a><li>
+
+                  <li class="">&nbsp;<a role="menuitem" href="../architecture/core_concepts/builds_and_image_streams.html">Image Streams</strong></a><li>
+
+                  <li class="">&nbsp;<a role="menuitem" href="../architecture/core_concepts/routes.html">Routes</strong></a><li>
+              </ul>
+            </li>
+            <!-- <li role="menuitem"><a>Additional Concepts</a></li> -->
+            <li role="menuitem" class="">
+              <a class="" href="javascript:void(0);" data-toggle="collapse" data-target="#topicSubGroup-1-3">
+                <span id="sgSpan-1-3" class="fa fa-caret-right"></span>&nbsp;Additional Concepts
+              </a>
+              <ul id="topicSubGroup-1-3" class="nav-tertiary list-unstyled collapse">
+
+                  <li class="">&nbsp;<a role="menuitem" href="../architecture/additional_concepts/authentication.html">Authentication</strong></a><li>
+
+                  <li class="">&nbsp;<a role="menuitem" href="../architecture/additional_concepts/authorization.html">Authorization</strong></a><li>
+
+                  <li class="">&nbsp;<a role="menuitem" href="../architecture/additional_concepts/other_api_objects.html">Other API Objects</strong></a><li>
+              </ul>
+            </li>
+        <li class='disabled'>
+          <h3>Installation and Configuration</h3>
+        </li>
+              <li role="menuitem" class=""><a href="../install_config/adding_hosts_to_existing_cluster.html">Adding Hosts to an Existing Cluster</a></li>
+              <li role="menuitem" class=""><a href="../install_config/certificate_customization.html">Configuring Custom Certificates</a></li>
+              <li role="menuitem" class=""><a href="../install_config/redeploying_certificates.html">Redeploying Certificates</a></li>
+              <li role="menuitem" class=""><a href="../install_config/configuring_authentication.html">Configuring Authentication and User Agent</a></li>
+              <li role="menuitem" class=""><a href="../install_config/syncing_groups_with_ldap.html">Syncing Groups With LDAP</a></li>
+            <!-- <li role="menuitem"><a>Advanced LDAP Configuration</a></li> -->
+            <li role="menuitem" class="">
+              <a class="" href="javascript:void(0);" data-toggle="collapse" data-target="#topicSubGroup-2-5">
+                <span id="sgSpan-2-5" class="fa fa-caret-right"></span>&nbsp;Advanced LDAP Configuration
+              </a>
+              <ul id="topicSubGroup-2-5" class="nav-tertiary list-unstyled collapse">
+
+                  <li class="">&nbsp;<a role="menuitem" href="../install_config/advanced_ldap_configuration/index.html">Overview</strong></a><li>
+
+                  <li class="">&nbsp;<a role="menuitem" href="../install_config/advanced_ldap_configuration/sssd_for_ldap_failover.html">Setting up SSSD for LDAP Failover</strong></a><li>
+
+                  <li class="">&nbsp;<a role="menuitem" href="../install_config/advanced_ldap_configuration/configuring_form_based_authentication.html">Configuring Form-Based Authentication</strong></a><li>
+
+                  <li class="">&nbsp;<a role="menuitem" href="../install_config/advanced_ldap_configuration/configuring_extended_ldap_attributes.html">Configuring Extended LDAP Attributes</strong></a><li>
+              </ul>
+            </li>
+              <li role="menuitem" class=""><a href="../install_config/web_console_customization.html">Customizing the Web Console</a></li>
+        <li class='disabled'>
+          <h3>Cluster Administration</h3>
+        </li>
+              <li role="menuitem" class=""><a href="../admin_guide/index.html">Overview</a></li>
+              <li role="menuitem" class=""><a href="../admin_guide/manage_users.html">Managing Users</a></li>
+              <li role="menuitem" class=""><a href="../admin_guide/managing_projects.html">Managing Projects</a></li>
+              <li role="menuitem" class=""><a href="../admin_guide/managing_pods.html">Managing Pods</a></li>
+              <li role="menuitem" class=""><a href="../admin_guide/managing_networking.html">Managing Networking</a></li>
+              <li role="menuitem" class=""><a href="../admin_guide/service_accounts.html">Configuring Service Accounts</a></li>
+              <li role="menuitem" class=""><a href="../admin_guide/manage_authorization_policy.html">Managing Authorization Policies</a></li>
+              <li role="menuitem" class=""><a href="../admin_guide/image_policy.html">Image Policy</a></li>
+              <li role="menuitem" class=""><a href="../admin_guide/scoped_tokens.html">Scoped Tokens</a></li>
+              <li role="menuitem" class=""><a href="../admin_guide/quota.html">Setting Quotas</a></li>
+              <li role="menuitem" class=""><a href="../admin_guide/multiproject_quota.html">Setting Multi-Project Quotas</a></li>
+              <li role="menuitem" class=""><a href="../admin_guide/limits.html">Setting Limit Ranges</a></li>
+              <li role="menuitem" class=""><a href="../admin_guide/allocating_node_resources.html">Allocating Node Resources</a></li>
+              <li role="menuitem" class=""><a href="../admin_guide/tcp_ingress_external_ports.html">Assigning Unique External IPs for Ingress Traffic</a></li>
+              <li role="menuitem" class=""><a href="../admin_guide/seccomp.html">Restricting Application Capabilities Using Seccomp</a></li>
+              <li role="menuitem" class=" active"><a href="../admin_guide/backup_restore.html">Backup and Restore</a></li>
+              <li role="menuitem" class=""><a href="../admin_guide/idling_applications.html">Idling Applications</a></li>
+        <li class='disabled'>
+          <h3>User Guide</h3>
+        </li>
+              <li role="menuitem" class=""><a href="../dev_guide/index.html">Overview</a></li>
+              <li role="menuitem" class=""><a href="../dev_guide/authentication.html">Authentication</a></li>
+              <li role="menuitem" class=""><a href="../dev_guide/managing_images.html">Managing Images</a></li>
+              <li role="menuitem" class=""><a href="../dev_guide/service_accounts.html">Service Accounts</a></li>
+        <li class='disabled'>
+          <h3>CLI Reference</h3>
+        </li>
+              <li role="menuitem" class=""><a href="../cli_reference/index.html">Overview</a></li>
+              <li role="menuitem" class=""><a href="../cli_reference/get_started_cli.html">Get Started with the CLI</a></li>
+              <li role="menuitem" class=""><a href="../cli_reference/manage_cli_profiles.html">Managing CLI Profiles</a></li>
+        <li class='disabled'>
+          <h3>REST API Reference</h3>
+        </li>
+              <li role="menuitem" class=""><a href="../rest_api/index.html">Overview</a></li>
+              <li role="menuitem" class=""><a href="../rest_api/openshift_v1.html">OpenShift v1</a></li>
+              <li role="menuitem" class=""><a href="../rest_api/kubernetes_v1.html">Kubernetes v1</a></li>
+</ul>
+    </nav>
+  </div>
+</div>
+</section>
+</div>
+<div class='row'>
+<div class='col-md-offset-3 col-md-9 col-lg-offset-2 col-lg-10' id='footer'>
+  <footer>
+<hr class='visible-print'>
+
+&copy; 2014&ndash;2016 Project Atomic. Sponsored by Red Hat, Inc.
+<div class='edit-this-page pull-right'>
+<a href="https://github.com/openshift/openshift-docs#contributing-to-openshift-documentation"><i class="icon fa fa-fw fa-github"></i>Edit this page on GitHub</a>
+</div>
+        <script type="text/javascript">
+        var _paq = _paq || [];
+        _paq.push(['trackPageView']);
+        _paq.push(['enableLinkTracking']);
+        (function() {
+        var u=(("https:" == document.location.protocol) ? "https" : "http") + "://piwik-osasteam.rhcloud.com/piwik/";
+        _paq.push(['setTrackerUrl', u+'piwik.php']);
+        _paq.push(['setSiteId', 4]);
+        var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0]; g.type='text/javascript';
+        g.defer=true; g.async=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+        })();
+        </script>
+<noscript><p><img src="https://piwik-osasteam.rhcloud.com/piwik/piwik.php?idsite=4" style="border:0;" alt="" /></p></noscript>
+</footer>
+</div>
+</div>
+
+</section>
+
+<script src="http://www.projectatomic.io/javascripts/application.js" type="text/javascript"></script>
+
+
+</body>
+</html>

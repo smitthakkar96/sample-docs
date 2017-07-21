@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]> <html class="no-js lt-ie10 lt-ie9 lt-ie8 lt-ie7" lang="en-us"> <![endif]-->
+<!--[if IE 7]> <html class="no-js lt-ie10 lt-ie9 lt-ie8" lang="en-us"> <![endif]-->
+<!--[if IE 8]> <html class="no-js lt-ie10 lt-ie9" lang="en-us"> <![endif]-->
+<!--[if IE 9]> <html class="no-js lt-ie10 lt-ie9" lang="en-us"> <![endif]-->
+<!--[if lt IE 10]> <html class="no-js lt-ie10" lang="en-us"> <![endif]-->
+<!--[if !IE]> > <![endif]-->
+<html class='no-js' lang='en'>
+<!-- <![endif] -->
+<head>
+<title>Atomic Registry Latest | Installation and Configuration | Redeploying Certificates</title>
+<meta charset='utf-8'>
+<meta content='' name='description'>
+<meta content='Project Atomic. Sponsored by Red Hat, Inc.' name='author'>
+<meta content='initial-scale=1.0,user-scalable=no,maximum-scale=1,width=device-width' name='viewport'>
+
+<link href='http://www.projectatomic.io/images/favicon.ico' rel='shortcut icon'>
+<link href='http://www.projectatomic.io/images/apple-touch-icon-precomposed.png' rel='apple-touch-icon-precomposed'>
+<link href='http://www.projectatomic.io/images/apple-touch-icon-57x57-precomposed.png' rel='apple-touch-icon-precomposed' sizes='57x57'>
+<link href='http://www.projectatomic.io/images/apple-touch-icon-72x72-precomposed.png' rel='apple-touch-icon-precomposed' sizes='72x72'>
+<link href='http://www.projectatomic.io/images/apple-touch-icon-114x114-precomposed.png' rel='apple-touch-icon-precomposed' sizes='114x114'>
+<link href='http://www.projectatomic.io/blog/feed.xml' rel='alternate' title='Project Atomic' type='application/atom+xml'>
+<link href="http://www.projectatomic.io/stylesheets/application.css" rel="stylesheet" type="text/css" />
+<link href="http://www.projectatomic.io/stylesheets/print.css" rel="stylesheet" type="text/css" media="print" />
+</head>
+<body class=' docs docs_introduction docs_introduction_index source-md'>
+<section class='container' id='page-wrap'>
+  <div class='row'>
+  <div class='col-md-3 col-lg-2' id='sidebar'>
+    <div id='nav-primary'>
+      <nav class='navbar navbar-default' role='navigation'>
+        <div class='navbar-header'>
+          <button class='navbar-toggle' data-target='.navbar-ex1-collapse' data-toggle='collapse'>
+            <span class='sr-only'>
+              Toggle navigation
+            </span>
+            <span class='icon-bar'></span>
+            <span class='icon-bar'></span>
+            <span class='icon-bar'></span>
+          </button>
+          <a class='navbar-brand' href='http://www.projectatomic.io/'>
+            Project Atomic
+          </a>
+        </div>
+        <div class='collapse navbar-collapse navbar-ex1-collapse'>
+          <ul class='nav navbar-nav'>
+            <li><a class="get-started" href="http://www.projectatomic.io/download">Get Started</a></li>
+            <li><a class="documentation" href="http://www.projectatomic.io/docs">Documentation</a></li>
+            <li><a class="developer-community" href="http://www.projectatomic.io/community">Developer Community</a></li>
+            <li><a class="on-github" href="https://github.com/projectatomic/">On GitHub</a></li>
+            <li><a class="ask" href="http://ask.projectatomic.io/">Ask</a></li>
+            <li><a class="blog" href="http://www.projectatomic.io/blog">Blog</a></li>
+            <li><a class="twitter" href="http://www.twitter.com/projectatomic">Twitter</a></li>
+            <li><a class="facebook" href="https://www.facebook.com/projectatomic">Facebook</a></li>
+            <li><a class="google" href="https://plus.google.com/108727025270662383247/posts">Google+</a></li>
+            <li><a class="rss" href="http://www.projectatomic.io/blog/feed.xml">RSS</a></li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+  </div>
+
+<section class='col-lg-10 col-md-9 container-fluid' id='content'>
+<!--[if lt IE 7]>
+<p class="chromeframe">You are using an outdated browser.
+<a href="http://browsehappy.com/">Upgrade your browser today</a> or
+<a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to better experience this site.</p>
+<![endif]-->
+<div class='row'>
+  <div class='col-sm-9'>
+    <h2>Redeploying Certificates</h2>
+    <div id="preamble">
+<div class="sectionbody">
+<div id="toc" class="toc">
+<div id="toctitle" class="title"></div>
+<ul class="sectlevel1">
+<li><a href="#overview">Overview</a></li>
+<li><a href="#install-config-cert-expiry">Checking Certificate Expirations</a>
+<ul class="sectlevel2">
+<li><a href="#install-config-cert-expiry-role-variables">Role Variables</a></li>
+<li><a href="#install-config-cert-expiry-running-playbooks">Running Certificate Expiration Playbooks</a></li>
+<li><a href="#cert-expiry-output-formats">Output Formats</a></li>
+</ul>
+</li>
+<li><a href="#redeploy-certificates">Redeploying Certificates</a>
+<ul class="sectlevel2">
+<li><a href="#redeploying-all-certificates-current-ca">Redeploying All Certificates Using the Current CA</a></li>
+<li><a href="#redeploying-new-custom-ca">Redeploying a New or Custom CA</a></li>
+<li><a href="#redeploying-master-certificates">Redeploying Master Certificates Only</a></li>
+<li><a href="#redeploying-etcd-certificates">Redeploying etcd Certificates Only</a></li>
+<li><a href="#redeploying-node-certificates">Redeploying Node Certificates Only</a></li>
+<li><a href="#redeploying-registry-router-certificates">Redeploying Registry or Router Certificates Only</a></li>
+<li><a href="#redeploying-custom-registry-or-router-certificates">Redeploying Custom Registry or Router Certificates</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="overview"><a class="anchor" href="#overview"></a>Overview</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Atomic Registry uses certificates to provide secure connections for the
+following components:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>masters (API server and controllers)</p>
+</li>
+<li>
+<p>etcd</p>
+</li>
+<li>
+<p>nodes</p>
+</li>
+<li>
+<p>registry</p>
+</li>
+<li>
+<p>router</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>You can use Ansible playbooks provided with the installer to automate checking
+expiration dates for cluster certificates. Playbooks are also provided to
+automate backing up and redeploying these certificates, which can fix common
+certificate errors.</p>
+</div>
+<div class="paragraph">
+<p>Possible use cases for redeploying certificates include:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>The installer detected the wrong host names and the issue was identified too late.</p>
+</li>
+<li>
+<p>The certificates are expired and you need to update them.</p>
+</li>
+<li>
+<p>You have a new CA and would like to create certificates using it instead.</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="install-config-cert-expiry"><a class="anchor" href="#install-config-cert-expiry"></a>Checking Certificate Expirations</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>You can use the installer to warn you about any certificates expiring within a
+configurable window of days and notify you about any certificates that have
+already expired. Certificate expiry playbooks use the Ansible role
+<code>openshift_certificate_expiry</code>.</p>
+</div>
+<div class="paragraph">
+<p>Certificates examined by the role include:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Master and node service certificates</p>
+</li>
+<li>
+<p>Router and registry service certificates from etcd secrets</p>
+</li>
+<li>
+<p>Master, node, router, registry, and <strong><em>kubeconfig</em></strong> files for <strong>cluster-admin</strong> users</p>
+</li>
+<li>
+<p>etcd certificates (including embedded)</p>
+</li>
+</ul>
+</div>
+<div class="sect2">
+<h3 id="install-config-cert-expiry-role-variables"><a class="anchor" href="#install-config-cert-expiry-role-variables"></a>Role Variables</h3>
+<div class="paragraph">
+<p>The <code>openshift_certificate_expiry</code> role uses the following variables:</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Table 1. Core Variables</caption>
+<colgroup>
+<col style="width: 40%;">
+<col style="width: 20%;">
+<col style="width: 40%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Variable Name</th>
+<th class="tableblock halign-left valign-top">Default Value</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>openshift_certificate_expiry_config_base</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/etc/origin</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Base Atomic Registry configuration directory.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>openshift_certificate_expiry_warning_days</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>30</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Flag certificates that will expire in this many days from now.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>openshift_certificate_expiry_show_all</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>no</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Include healthy (non-expired and non-warning) certificates in results.</p></td>
+</tr>
+</tbody>
+</table>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Table 2. Optional Variables</caption>
+<colgroup>
+<col style="width: 40%;">
+<col style="width: 20%;">
+<col style="width: 40%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">Variable Name</th>
+<th class="tableblock halign-left valign-top">Default Value</th>
+<th class="tableblock halign-left valign-top">Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>openshift_certificate_expiry_generate_html_report</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>no</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Generate an HTML report of the expiry check results.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>openshift_certificate_expiry_html_report_path</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/tmp/cert-expiry-report.html</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The full path for saving the HTML report.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>openshift_certificate_expiry_save_json_results</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>no</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Save expiry check results as a JSON file.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>openshift_certificate_expiry_json_results_path</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/tmp/cert-expiry-report.json</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The full path for saving the JSON report.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sect2">
+<h3 id="install-config-cert-expiry-running-playbooks"><a class="anchor" href="#install-config-cert-expiry-running-playbooks"></a>Running Certificate Expiration Playbooks</h3>
+<div class="paragraph">
+<p>The Atomic Registry installer provides a set of example certificate expiration
+playbooks, using different sets of configuration for the
+<code>openshift_certificate_expiry</code> role.</p>
+</div>
+<div class="paragraph">
+<p>These playbooks must be used with an
+<a href="../install_config/install/advanced_install.html#configuring-ansible">inventory file</a> that is representative of the cluster. For best results, run
+<code>ansible-playbook</code> with the <code>-v</code> option.</p>
+</div>
+<div class="paragraph">
+<p>Using the <strong><em>easy-mode.yaml</em></strong> example playbook, you can try the role out before
+tweaking it to your specifications as needed. This playbook:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Produces JSON and stylized HTML reports in <strong><em>/tmp/</em></strong>.</p>
+</li>
+<li>
+<p>Sets the warning window very large, so you will almost always get results back.</p>
+</li>
+<li>
+<p>Includes all certificates (healthy or not) in the results.</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="title"><strong><em>easy-mode.yaml</em></strong> Playbook</div>
+<div class="content">
+<pre>- name: Check cert expirys
+  hosts: nodes:masters:etcd
+  become: yes
+  gather_facts: no
+  vars:
+    openshift_certificate_expiry_warning_days: 1500
+    openshift_certificate_expiry_save_json_results: yes
+    openshift_certificate_expiry_generate_html_report: yes
+    openshift_certificate_expiry_show_all: yes
+  roles:
+    - role: openshift_certificate_expiry</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>To run the <strong><em>easy-mode.yaml</em></strong>  playbook:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ ansible-playbook -v -i &lt;inventory_file&gt; \
+    /usr/share/ansible/openshift-ansible/playbooks/certificate_expiry/easy-mode.yaml</pre>
+</div>
+</div>
+<h4 id="cert-expiry-other-playbooks" class="discrete">Other Example Playbooks</h4>
+<div class="paragraph">
+<p>The other example playbooks are also available to run directly out of the
+<strong><em>/usr/share/ansible/openshift-ansible/playbooks/certificate_expiry/</em></strong>
+directory.</p>
+</div>
+<table class="tableblock frame-all grid-all spread">
+<caption class="title">Table 3. Other Example Playbooks</caption>
+<colgroup>
+<col style="width: 50%;">
+<col style="width: 50%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">File Name</th>
+<th class="tableblock halign-left valign-top">Usage</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><em>default.yaml</em></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Produces the default behavior of the <code>openshift_certificate_expiry</code> role.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><em>html_and_json_default_paths.yaml</em></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Generates HTML and JSON artifacts in their default paths.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><em>longer_warning_period.yaml</em></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Changes the expiration warning window to 1500 days.</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><strong><em>longer-warning-period-json-results.yaml</em></strong></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Changes the expiration warning window to 1500 days and saves the results as a JSON file.</p></td>
+</tr>
+</tbody>
+</table>
+<div class="paragraph">
+<p>To run any of these example playbooks:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ ansible-playbook -v -i &lt;inventory_file&gt; \
+    /usr/share/ansible/openshift-ansible/playbooks/certificate_expiry/&lt;playbook&gt;</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="cert-expiry-output-formats"><a class="anchor" href="#cert-expiry-output-formats"></a>Output Formats</h3>
+<div class="paragraph">
+<p>As noted above, there are two ways to format your check report. In JSON format
+for machine parsing, or as a stylized HTML page for easy skimming.</p>
+</div>
+<h4 id="cert-expiry-output-formats-html" class="discrete">HTML Report</h4>
+<div class="paragraph">
+<p>An example of an HTML report is provided with the installer. You can open the
+following file in your browser to view it:</p>
+</div>
+<div class="paragraph">
+<p><strong><em>/usr/share/ansible/openshift-ansible/roles/openshift_certificate_expiry/examples/cert-expiry-report.html</em></strong></p>
+</div>
+<h4 id="cert-expiry-output-formats-json" class="discrete">JSON Report</h4>
+<div class="paragraph">
+<p>There are two top-level keys in the saved JSON results: <code>data</code> and <code>summary</code>.</p>
+</div>
+<div class="paragraph">
+<p>The <code>data</code> key is a hash where the keys are the names of each host examined and
+the values are the check results for the certificates identified on each
+respective host.</p>
+</div>
+<div class="paragraph">
+<p>The <code>summary</code> key is a hash that summarizes the total number of certificates:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>examined on the entire cluster</p>
+</li>
+<li>
+<p>that are OK</p>
+</li>
+<li>
+<p>expiring within the configured warning window</p>
+</li>
+<li>
+<p>already expired</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>For an example of the full JSON report, see <strong><em>/usr/share/ansible/openshift-ansible/roles/openshift_certificate_expiry/examples/cert-expiry-report.json</em></strong>.</p>
+</div>
+<div class="paragraph">
+<p>The summary from the JSON data can be easily checked for warnings or expirations
+using a variety of command-line tools. For example, using <code>grep</code> you can look
+for the word <code>summary</code> and print out the two lines after the match (<code>-A2</code>):</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ grep -A2 summary /tmp/cert-expiry-report.json
+    "summary": {
+        "warning": 16,
+        "expired": 0</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If available, the <code>jq</code> tool can also be used to pick out specific values. The
+first two examples below show how to select just one value, either <code>warning</code> or
+<code>expired</code>. The third example shows how to select both values at once:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ jq '.summary.warning' /tmp/cert-expiry-report.json
+16
+
+$ jq '.summary.expired' /tmp/cert-expiry-report.json
+0
+
+$ jq '.summary.warning,.summary.expired' /tmp/cert-expiry-report.json
+16
+0</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="redeploy-certificates"><a class="anchor" href="#redeploy-certificates"></a>Redeploying Certificates</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Use the following playbooks to redeploy master, etcd, node, registry, and router
+certificates on all relevant hosts. You can redeploy all of them at once using
+the current CA, redeploy certificates for specific components only, or redeploy
+a newly generated or custom CA on its own.</p>
+</div>
+<div class="paragraph">
+<p>Just like the certificate expiry playbooks, these playbooks must be run with an
+<a href="../install_config/install/advanced_install.html#configuring-ansible">inventory file</a> that is representative of the cluster.</p>
+</div>
+<div class="paragraph">
+<p>In particular, the inventory must specify or override all host names and IP
+addresses set via the following variables such that they match the current
+cluster configuration:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p><code>openshift_hostname</code></p>
+</li>
+<li>
+<p><code>openshift_public_hostname</code></p>
+</li>
+<li>
+<p><code>openshift_ip</code></p>
+</li>
+<li>
+<p><code>openshift_public_ip</code></p>
+</li>
+<li>
+<p><code>openshift_master_cluster_hostname</code></p>
+</li>
+<li>
+<p><code>openshift_master_cluster_public_hostname</code></p>
+</li>
+</ul>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+<div class="paragraph">
+<p>The validity (length in days until they expire) for any certificates
+auto-generated while redeploying can be configured via Ansible as well. See
+<a href="../install_config/install/advanced_install.html#advanced-install-config-certificate-validity">Configuring Certificate Validity</a>.</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div class="sect2">
+<h3 id="redeploying-all-certificates-current-ca"><a class="anchor" href="#redeploying-all-certificates-current-ca"></a>Redeploying All Certificates Using the Current CA</h3>
+<div class="paragraph">
+<p>The <strong><em>redeploy-certificates.yml</em></strong> playbook does <em>not</em> regenerate the
+Atomic Registry CA certificate. New master, etcd, node, registry, and router
+certificates are created using the current CA certificate to sign new
+certificates.</p>
+</div>
+<div class="paragraph">
+<p>This also includes serial restarts of:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>etcd</p>
+</li>
+<li>
+<p>master services</p>
+</li>
+<li>
+<p>node services</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>To redeploy master, etcd, and node certificates using the current
+Atomic Registry CA, run this playbook, specifying your inventory file:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ ansible-playbook -i &lt;inventory_file&gt; \
+    /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/redeploy-certificates.yml</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="redeploying-new-custom-ca"><a class="anchor" href="#redeploying-new-custom-ca"></a>Redeploying a New or Custom CA</h3>
+<div class="paragraph">
+<p>The <strong><em>redeploy-openshift-ca.yml</em></strong> playbook redeploys the Atomic Registry CA
+certificate by generating a new CA certificate and distributing an updated
+bundle to all components including client <strong><em>kubeconfig</em></strong> files and the node&#8217;s
+database of trusted CAs (the CA-trust).</p>
+</div>
+<div class="paragraph">
+<p>This also includes serial restarts of:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>etcd</p>
+</li>
+<li>
+<p>master services</p>
+</li>
+<li>
+<p>node services</p>
+</li>
+<li>
+<p>docker</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Additionally, you can specify a
+<a href="../install_config/certificate_customization.html#install-config-certificate-customization">custom CA certificate</a> when redeploying certificates instead of relying on a CA
+generated by Atomic Registry.</p>
+</div>
+<div class="paragraph">
+<p>When the master services are restarted, the registry and routers can continue to
+communicate with the master without being redeployed because the master&#8217;s
+serving certificate is the same, and the CA the registry and routers have are
+still valid.</p>
+</div>
+<div class="paragraph">
+<p>To redeploy a newly generated or custom CA:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>If you want to use a custom CA, set the following variable in your inventory
+file:</p>
+<div class="listingblock">
+<div class="content">
+<pre># Configure custom ca certificate
+# NOTE: CA certificate will not be replaced with existing clusters.
+# This option may only be specified when creating a new cluster or
+# when redeploying cluster certificates with the redeploy-certificates
+# playbook.
+openshift_master_ca_certificate={'certfile': '&lt;/path/to/ca.crt&gt;', 'keyfile': '&lt;/path/to/ca.key&gt;'}</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If you do not set the above, then the current CA will be regenerated in the next
+step.</p>
+</div>
+</li>
+<li>
+<p>Run the <strong><em>redeploy-openshift-ca.yml</em></strong> playbook, specifying your inventory file:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ ansible-playbook -i &lt;inventory_file&gt; \
+    /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/redeploy-openshift-ca.yml</pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>With the new CA in place, you can then use the
+<a href="#redeploying-all-certificates-current-ca"><strong><em>redeploy-certificates.yml</em></strong> playbook</a> at your discretion whenever you want to redeploy certificates signed
+by the new CA on all components.</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="redeploying-master-certificates"><a class="anchor" href="#redeploying-master-certificates"></a>Redeploying Master Certificates Only</h3>
+<div class="paragraph">
+<p>The <strong><em>redeploy-master-certificates.yml</em></strong> playbook only redeploys master
+certificates. This also includes serial restarts of master services.</p>
+</div>
+<div class="paragraph">
+<p>To redeploy master certificates, run this playbook, specifying your inventory
+file:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ ansible-playbook -i &lt;inventory_file&gt; \
+    /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/redeploy-master-certificates.yml</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="redeploying-etcd-certificates"><a class="anchor" href="#redeploying-etcd-certificates"></a>Redeploying etcd Certificates Only</h3>
+<div class="paragraph">
+<p>The <strong><em>redeploy-etcd-certificates.yml</em></strong> playbook only redeploys etcd certificates
+including master client certificates.</p>
+</div>
+<div class="paragraph">
+<p>This also include serial restarts of:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>etcd</p>
+</li>
+<li>
+<p>master services.</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>To redeploy etcd certificates, run this playbook, specifying your inventory
+file:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ ansible-playbook -i &lt;inventory_file&gt; \
+    /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/redeploy-etcd-certificates.yml</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="redeploying-node-certificates"><a class="anchor" href="#redeploying-node-certificates"></a>Redeploying Node Certificates Only</h3>
+<div class="paragraph">
+<p>The <strong><em>redeploy-node-certificates.yml</em></strong> playbook only redeploys node
+certificates. This also include serial restarts of node services.</p>
+</div>
+<div class="paragraph">
+<p>To redeploy node certificates, run this playbook, specifying your inventory
+file:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ ansible-playbook -i &lt;inventory_file&gt; \
+    /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/redeploy-node-certificates.yml</pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="redeploying-registry-router-certificates"><a class="anchor" href="#redeploying-registry-router-certificates"></a>Redeploying Registry or Router Certificates Only</h3>
+<div class="paragraph">
+<p>The <strong><em>redeploy-registry-certificates.yml</em></strong> and
+<strong><em>redeploy-router-certificates.yml</em></strong> playbooks replace installer-created
+certificates for the registry and router. If custom certificates are in use for
+these components, see
+<a href="#redeploying-custom-registry-or-router-certificates">Redeploying Custom
+Registry or Router Certificates</a> to replace them manually.</p>
+</div>
+<div class="sect3">
+<h4 id="redeploying-registry-certificates"><a class="anchor" href="#redeploying-registry-certificates"></a>Redeploying Registry Certificates Only</h4>
+<div class="paragraph">
+<p>To redeploy registry certificates, run the following playbook, specifying your
+inventory file:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ ansible-playbook -i &lt;inventory_file&gt; \
+    /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/redeploy-registry-certificates.yml</pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="redeploying-router-certificates"><a class="anchor" href="#redeploying-router-certificates"></a>Redeploying Router Certificates Only</h4>
+<div class="paragraph">
+<p>To redeploy router certificates, run the following playbook, specifying your
+inventory file:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ ansible-playbook -i &lt;inventory_file&gt; \
+    /usr/share/ansible/openshift-ansible/playbooks/byo/openshift-cluster/redeploy-router-certificates.yml</pre>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="redeploying-custom-registry-or-router-certificates"><a class="anchor" href="#redeploying-custom-registry-or-router-certificates"></a>Redeploying Custom Registry or Router Certificates</h3>
+<div class="paragraph">
+<p>When nodes are evacuated due to a redeployed CA, registry and router pods are
+restarted. If the registry and router certificates were not also redeployed with
+the new CA, this can cause outages because they cannot reach the masters using
+their old certificates.</p>
+</div>
+<div class="paragraph">
+<p>The playbooks for redeploying certificates cannot redeploy custom registry or
+router certificates, so to address this issue, you can manually redeploy the
+registry and router certificates.</p>
+</div>
+<div class="sect3">
+<h4 id="redeploying-registry-certificates-manually"><a class="anchor" href="#redeploying-registry-certificates-manually"></a>Redeploying Registry Certificates Manually</h4>
+<div class="paragraph">
+<p>To redeploy registry certificates manually, you must add new registry
+certificates to a secret named <code>registry-certificates</code>, then redeploy the
+registry:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Switch to the <code>default</code> project for the remainder of these steps:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ oc project default</pre>
+</div>
+</div>
+</li>
+<li>
+<p>If your registry was initially created on Atomic Registry 3.1 or earlier, it may
+still be using environment variables to store certificates (which has been
+deprecated in favor of using secrets).</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>Run the following and look for the
+<code>OPENSHIFT_CA_DATA</code>, <code>OPENSHIFT_CERT_DATA</code>, <code>OPENSHIFT_KEY_DATA</code> environment
+variables:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ oc env dc/docker-registry --list</pre>
+</div>
+</div>
+</li>
+<li>
+<p>If they do not exist, skip this step. If they do, create the following <code>ClusterRoleBinding</code>:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ cat &lt;&lt;EOF |
+apiVersion: v1
+groupNames: null
+kind: ClusterRoleBinding
+metadata:
+  creationTimestamp: null
+  name: registry-registry-role
+roleRef:
+  kind: ClusterRole
+  name: system:registry
+subjects:
+- kind: ServiceAccount
+  name: registry
+  namespace: default
+userNames:
+- system:serviceaccount:default:registry
+EOF
+oc create -f -</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then, run the following to remove the environment variables:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ oc env dc/docker-registry OPENSHIFT_CA_DATA- OPENSHIFT_CERT_DATA- OPENSHIFT_KEY_DATA- OPENSHIFT_MASTER-</pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Set the following environment variables locally to make later commands less
+complex:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ REGISTRY_IP=`oc get service docker-registry -o jsonpath='{.spec.clusterIP}'`
+$ REGISTRY_HOSTNAME=`oc get route/docker-registry -o jsonpath='{.spec.host}'`</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Create new registry certificates:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ oc adm ca create-server-cert \
+    --signer-cert=/etc/origin/master/ca.crt \
+    --signer-key=/etc/origin/master/ca.key \
+    --hostnames=$REGISTRY_IP,docker-registry.default.svc.cluster.local,$REGISTRY_HOSTNAME \
+    --cert=/etc/origin/master/registry.crt \
+    --key=/etc/origin/master/registry.key \
+    --signer-serial=/etc/origin/master/ca.serial.txt</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Update the <code>registry-certificates</code> secret with the new registry certificates:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ oc secret new registry-certificates \
+    /etc/origin/master/registry.crt \
+    /etc/origin/master/registry.key \
+    -o json | oc replace -f -</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Redeploy the registry:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ oc deploy dc/docker-registry --latest</pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect3">
+<h4 id="redeploying-router-certificates-manually"><a class="anchor" href="#redeploying-router-certificates-manually"></a>Redeploying Router Certificates Manually</h4>
+<div class="paragraph">
+<p>When routers are initially deployed, an annotation is added to the router&#8217;s
+service that automatically creates a
+<a href="../dev_guide/secrets.html#service-serving-certificate-secrets">service serving certificate secret</a>.</p>
+</div>
+<div class="paragraph">
+<p>To redeploy router certificates manually, that service serving certificate can
+be triggered to be recreated by deleting the secret, removing and re-adding
+annotations to the <code>router</code> service, then redeploying the router:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Switch to the <code>default</code> project for the remainder of these steps:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ oc project default</pre>
+</div>
+</div>
+</li>
+<li>
+<p>If your router was initially created on Atomic Registry 3.1 or earlier, it may
+still be using environment variables to store certificates (which has been
+deprecated in favor of using service serving certificate secret).</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>Run the following and look for the
+<code>OPENSHIFT_CA_DATA</code>, <code>OPENSHIFT_CERT_DATA</code>, <code>OPENSHIFT_KEY_DATA</code> environment
+variables:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ oc env dc/router --list</pre>
+</div>
+</div>
+</li>
+<li>
+<p>If they do not exist, skip this step. If they do, create the following <code>ClusterRoleBinding</code>:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ cat &lt;&lt;EOF |
+apiVersion: v1
+groupNames: null
+kind: ClusterRoleBinding
+metadata:
+  creationTimestamp: null
+  name: router-router-role
+roleRef:
+  kind: ClusterRole
+  name: system:router
+subjects:
+- kind: ServiceAccount
+  name: router
+  namespace: default
+userNames:
+- system:serviceaccount:default:router
+EOF
+oc create -f -</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Then, run the following to remove the environment variables:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>$ oc env dc/router OPENSHIFT_CA_DATA- OPENSHIFT_CERT_DATA- OPENSHIFT_KEY_DATA- OPENSHIFT_MASTER-</pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>Delete the <code>router-certs</code> secret:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ oc delete secret router-certs</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Remove the following annotations from the <code>router</code> service:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ oc annotate service router \
+    service.alpha.openshift.io/serving-cert-secret-name- \
+    service.alpha.openshift.io/serving-cert-signed-by-</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Re-add the annotations:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ oc annotate service router \
+    service.alpha.openshift.io/serving-cert-secret-name=router-certs</pre>
+</div>
+</div>
+</li>
+<li>
+<p>Redeploy the router:</p>
+<div class="listingblock">
+<div class="content">
+<pre>$ oc rollout latest dc/router</pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+</div>
+</div>
+</div>
+</div>
+  </div>
+
+  <div class='col-sm-3 hidden-print'>
+    <h2>Atomic Registry</h2>
+    <nav role='navigation'>
+      <ul class='docbrowser nav nav-vertical'>
+        <li class='disabled'>
+          <h3>Quickstart</h3>
+        </li>
+              <li role="menuitem" class=""><a href="../registry_quickstart/index.html">Overview</a></li>
+              <li role="menuitem" class=""><a href="../registry_quickstart/developers.html">Developers</a></li>
+            <!-- <li role="menuitem"><a>Administrators</a></li> -->
+            <li role="menuitem" class="">
+              <a class="" href="javascript:void(0);" data-toggle="collapse" data-target="#topicSubGroup-0-2">
+                <span id="sgSpan-0-2" class="fa fa-caret-right"></span>&nbsp;Administrators
+              </a>
+              <ul id="topicSubGroup-0-2" class="nav-tertiary list-unstyled collapse">
+
+                  <li class="">&nbsp;<a role="menuitem" href="../registry_quickstart/administrators/index.html">Overview</strong></a><li>
+
+                  <li class="">&nbsp;<a role="menuitem" href="../registry_quickstart/administrators/system_configuration.html">System Configuration</strong></a><li>
+
+                  <li class="">&nbsp;<a role="menuitem" href="../registry_quickstart/administrators/uninstall.html">Uninstall</strong></a><li>
+              </ul>
+            </li>
+        <li class='disabled'>
+          <h3>Architecture</h3>
+        </li>
+              <li role="menuitem" class=""><a href="../architecture/index.html">Overview</a></li>
+            <!-- <li role="menuitem"><a>Infrastructure Components</a></li> -->
+            <li role="menuitem" class="">
+              <a class="" href="javascript:void(0);" data-toggle="collapse" data-target="#topicSubGroup-1-1">
+                <span id="sgSpan-1-1" class="fa fa-caret-right"></span>&nbsp;Infrastructure Components
+              </a>
+              <ul id="topicSubGroup-1-1" class="nav-tertiary list-unstyled collapse">
+
+                  <li class="">&nbsp;<a role="menuitem" href="../architecture/infrastructure_components/kubernetes_infrastructure.html">Kubernetes Infrastructure</strong></a><li>
+
+                  <li class="">&nbsp;<a role="menuitem" href="../architecture/infrastructure_components/image_registry.html">Container Registry</strong></a><li>
+
+                  <li class="">&nbsp;<a role="menuitem" href="../architecture/infrastructure_components/web_console.html">Web Console</strong></a><li>
+              </ul>
+            </li>
+            <!-- <li role="menuitem"><a>Core Concepts</a></li> -->
+            <li role="menuitem" class="">
+              <a class="" href="javascript:void(0);" data-toggle="collapse" data-target="#topicSubGroup-1-2">
+                <span id="sgSpan-1-2" class="fa fa-caret-right"></span>&nbsp;Core Concepts
+              </a>
+              <ul id="topicSubGroup-1-2" class="nav-tertiary list-unstyled collapse">
+
+                  <li class="">&nbsp;<a role="menuitem" href="../architecture/core_concepts/containers_and_images.html">Images</strong></a><li>
+
+                  <li class="">&nbsp;<a role="menuitem" href="../architecture/core_concepts/projects_and_users.html">Projects and Users</strong></a><li>
+
+                  <li class="">&nbsp;<a role="menuitem" href="../architecture/core_concepts/builds_and_image_streams.html">Image Streams</strong></a><li>
+
+                  <li class="">&nbsp;<a role="menuitem" href="../architecture/core_concepts/routes.html">Routes</strong></a><li>
+              </ul>
+            </li>
+            <!-- <li role="menuitem"><a>Additional Concepts</a></li> -->
+            <li role="menuitem" class="">
+              <a class="" href="javascript:void(0);" data-toggle="collapse" data-target="#topicSubGroup-1-3">
+                <span id="sgSpan-1-3" class="fa fa-caret-right"></span>&nbsp;Additional Concepts
+              </a>
+              <ul id="topicSubGroup-1-3" class="nav-tertiary list-unstyled collapse">
+
+                  <li class="">&nbsp;<a role="menuitem" href="../architecture/additional_concepts/authentication.html">Authentication</strong></a><li>
+
+                  <li class="">&nbsp;<a role="menuitem" href="../architecture/additional_concepts/authorization.html">Authorization</strong></a><li>
+
+                  <li class="">&nbsp;<a role="menuitem" href="../architecture/additional_concepts/other_api_objects.html">Other API Objects</strong></a><li>
+              </ul>
+            </li>
+        <li class='disabled'>
+          <h3>Installation and Configuration</h3>
+        </li>
+              <li role="menuitem" class=""><a href="../install_config/adding_hosts_to_existing_cluster.html">Adding Hosts to an Existing Cluster</a></li>
+              <li role="menuitem" class=""><a href="../install_config/certificate_customization.html">Configuring Custom Certificates</a></li>
+              <li role="menuitem" class=" active"><a href="../install_config/redeploying_certificates.html">Redeploying Certificates</a></li>
+              <li role="menuitem" class=""><a href="../install_config/configuring_authentication.html">Configuring Authentication and User Agent</a></li>
+              <li role="menuitem" class=""><a href="../install_config/syncing_groups_with_ldap.html">Syncing Groups With LDAP</a></li>
+            <!-- <li role="menuitem"><a>Advanced LDAP Configuration</a></li> -->
+            <li role="menuitem" class="">
+              <a class="" href="javascript:void(0);" data-toggle="collapse" data-target="#topicSubGroup-2-5">
+                <span id="sgSpan-2-5" class="fa fa-caret-right"></span>&nbsp;Advanced LDAP Configuration
+              </a>
+              <ul id="topicSubGroup-2-5" class="nav-tertiary list-unstyled collapse">
+
+                  <li class="">&nbsp;<a role="menuitem" href="../install_config/advanced_ldap_configuration/index.html">Overview</strong></a><li>
+
+                  <li class="">&nbsp;<a role="menuitem" href="../install_config/advanced_ldap_configuration/sssd_for_ldap_failover.html">Setting up SSSD for LDAP Failover</strong></a><li>
+
+                  <li class="">&nbsp;<a role="menuitem" href="../install_config/advanced_ldap_configuration/configuring_form_based_authentication.html">Configuring Form-Based Authentication</strong></a><li>
+
+                  <li class="">&nbsp;<a role="menuitem" href="../install_config/advanced_ldap_configuration/configuring_extended_ldap_attributes.html">Configuring Extended LDAP Attributes</strong></a><li>
+              </ul>
+            </li>
+              <li role="menuitem" class=""><a href="../install_config/web_console_customization.html">Customizing the Web Console</a></li>
+        <li class='disabled'>
+          <h3>Cluster Administration</h3>
+        </li>
+              <li role="menuitem" class=""><a href="../admin_guide/index.html">Overview</a></li>
+              <li role="menuitem" class=""><a href="../admin_guide/manage_users.html">Managing Users</a></li>
+              <li role="menuitem" class=""><a href="../admin_guide/managing_projects.html">Managing Projects</a></li>
+              <li role="menuitem" class=""><a href="../admin_guide/managing_pods.html">Managing Pods</a></li>
+              <li role="menuitem" class=""><a href="../admin_guide/managing_networking.html">Managing Networking</a></li>
+              <li role="menuitem" class=""><a href="../admin_guide/service_accounts.html">Configuring Service Accounts</a></li>
+              <li role="menuitem" class=""><a href="../admin_guide/manage_authorization_policy.html">Managing Authorization Policies</a></li>
+              <li role="menuitem" class=""><a href="../admin_guide/image_policy.html">Image Policy</a></li>
+              <li role="menuitem" class=""><a href="../admin_guide/scoped_tokens.html">Scoped Tokens</a></li>
+              <li role="menuitem" class=""><a href="../admin_guide/quota.html">Setting Quotas</a></li>
+              <li role="menuitem" class=""><a href="../admin_guide/multiproject_quota.html">Setting Multi-Project Quotas</a></li>
+              <li role="menuitem" class=""><a href="../admin_guide/limits.html">Setting Limit Ranges</a></li>
+              <li role="menuitem" class=""><a href="../admin_guide/allocating_node_resources.html">Allocating Node Resources</a></li>
+              <li role="menuitem" class=""><a href="../admin_guide/tcp_ingress_external_ports.html">Assigning Unique External IPs for Ingress Traffic</a></li>
+              <li role="menuitem" class=""><a href="../admin_guide/seccomp.html">Restricting Application Capabilities Using Seccomp</a></li>
+              <li role="menuitem" class=""><a href="../admin_guide/backup_restore.html">Backup and Restore</a></li>
+              <li role="menuitem" class=""><a href="../admin_guide/idling_applications.html">Idling Applications</a></li>
+        <li class='disabled'>
+          <h3>User Guide</h3>
+        </li>
+              <li role="menuitem" class=""><a href="../dev_guide/index.html">Overview</a></li>
+              <li role="menuitem" class=""><a href="../dev_guide/authentication.html">Authentication</a></li>
+              <li role="menuitem" class=""><a href="../dev_guide/managing_images.html">Managing Images</a></li>
+              <li role="menuitem" class=""><a href="../dev_guide/service_accounts.html">Service Accounts</a></li>
+        <li class='disabled'>
+          <h3>CLI Reference</h3>
+        </li>
+              <li role="menuitem" class=""><a href="../cli_reference/index.html">Overview</a></li>
+              <li role="menuitem" class=""><a href="../cli_reference/get_started_cli.html">Get Started with the CLI</a></li>
+              <li role="menuitem" class=""><a href="../cli_reference/manage_cli_profiles.html">Managing CLI Profiles</a></li>
+        <li class='disabled'>
+          <h3>REST API Reference</h3>
+        </li>
+              <li role="menuitem" class=""><a href="../rest_api/index.html">Overview</a></li>
+              <li role="menuitem" class=""><a href="../rest_api/openshift_v1.html">OpenShift v1</a></li>
+              <li role="menuitem" class=""><a href="../rest_api/kubernetes_v1.html">Kubernetes v1</a></li>
+</ul>
+    </nav>
+  </div>
+</div>
+</section>
+</div>
+<div class='row'>
+<div class='col-md-offset-3 col-md-9 col-lg-offset-2 col-lg-10' id='footer'>
+  <footer>
+<hr class='visible-print'>
+
+&copy; 2014&ndash;2016 Project Atomic. Sponsored by Red Hat, Inc.
+<div class='edit-this-page pull-right'>
+<a href="https://github.com/openshift/openshift-docs#contributing-to-openshift-documentation"><i class="icon fa fa-fw fa-github"></i>Edit this page on GitHub</a>
+</div>
+        <script type="text/javascript">
+        var _paq = _paq || [];
+        _paq.push(['trackPageView']);
+        _paq.push(['enableLinkTracking']);
+        (function() {
+        var u=(("https:" == document.location.protocol) ? "https" : "http") + "://piwik-osasteam.rhcloud.com/piwik/";
+        _paq.push(['setTrackerUrl', u+'piwik.php']);
+        _paq.push(['setSiteId', 4]);
+        var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0]; g.type='text/javascript';
+        g.defer=true; g.async=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+        })();
+        </script>
+<noscript><p><img src="https://piwik-osasteam.rhcloud.com/piwik/piwik.php?idsite=4" style="border:0;" alt="" /></p></noscript>
+</footer>
+</div>
+</div>
+
+</section>
+
+<script src="http://www.projectatomic.io/javascripts/application.js" type="text/javascript"></script>
+
+
+</body>
+</html>
